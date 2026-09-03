@@ -482,14 +482,86 @@ td{
 .no-pen{color:var(--muted);font-size:11px;padding:8px 0}
 @media(max-width:650px){.rank-detail-grid{grid-template-columns:1fr}}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Staatliches&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style id="copa-reference-visual">
+:root{
+ --carbon:#16110E;--carbon-2:#201914;--rojo:#C8272D;--rojo-osc:#8E1B20;
+ --dorado:#D4A94E;--dorado-suave:#E6C77E;--crema:#F3EADB;--humo:#9A8D7E;
+ --linea:rgba(212,169,78,.25);--ok:#4CAF7D;--err:#E05252;
+ --bg:var(--carbon);--bg-soft:var(--carbon-2);--card:var(--carbon-2);--card-soft:#241c17;
+ --line:var(--linea);--line2:rgba(212,169,78,.4);--red:var(--rojo);--red-dark:var(--rojo-osc);
+ --gold:var(--dorado);--gold-soft:var(--dorado-suave);--text:var(--crema);--muted:var(--humo);
+ --green:var(--ok);--radius:0;--radius-sm:0;
+}
+body{
+ font-family:'Barlow',sans-serif;
+ background-color:var(--carbon);
+ background-image:radial-gradient(ellipse at 50% -10%,rgba(200,39,45,.18),transparent 55%),
+ radial-gradient(ellipse at 90% 100%,rgba(212,169,78,.06),transparent 50%);
+ color:var(--crema);
+}
+.shell{max-width:1180px;padding-top:0}
+.hero{
+ margin-top:0;padding:48px 28px 34px;text-align:center;display:block;border:0;border-radius:0;
+ background:transparent;box-shadow:none;position:relative;
+}
+.hero:before{content:"";position:absolute;left:-10%;right:-10%;top:24px;height:9px;background:var(--rojo);transform:rotate(-2deg)}
+.hero:after{content:"";position:absolute;left:-10%;right:-10%;top:38px;width:auto;height:3px;border:0;border-radius:0;background:var(--dorado);transform:rotate(-2deg);box-shadow:none}
+.eyebrow{font-family:'Staatliches',sans-serif;color:var(--dorado);letter-spacing:.28em;font-size:.9rem}
+.hero h1{font-family:'Staatliches',sans-serif;font-weight:400;font-size:clamp(2.5rem,6vw,4.3rem);letter-spacing:.03em;line-height:.95;margin-top:12px}
+.hero p{color:var(--humo);margin-top:9px}
+.flow{gap:4px;margin:0}
+.tab{
+ border-radius:0;background:var(--carbon-2);border:1px solid var(--linea);min-height:78px;
+ box-shadow:none;font-family:'Barlow',sans-serif;color:var(--humo)
+}
+.tab strong{font-family:'Staatliches',sans-serif;font-weight:400;letter-spacing:.09em;font-size:1rem}
+.tab .n{border-radius:0;background:var(--carbon);color:var(--dorado);font-family:'Staatliches',sans-serif}
+.tab.active{background:linear-gradient(160deg,var(--rojo-osc),var(--rojo));border-color:var(--dorado);box-shadow:none}
+.tab.active .n{background:var(--dorado);color:var(--carbon)}
+.card{border-radius:0;background:var(--carbon-2);border:1px solid var(--linea);border-top:4px solid var(--rojo);box-shadow:none;backdrop-filter:none}
+.card-title{font-family:'Staatliches',sans-serif;font-size:1.15rem;font-weight:400;letter-spacing:.12em;color:var(--dorado);border-bottom:1px solid var(--linea)}
+.card-title:before{width:5px;height:24px;border-radius:0;background:var(--rojo)}
+label{color:var(--humo);font-size:.76rem}
+input,select,textarea{border-radius:0;background:var(--carbon);border:1px solid var(--linea);color:var(--crema)}
+input:focus,select:focus,textarea:focus{border-color:var(--dorado);box-shadow:none}
+.mode,.mode-block,.team,.active-team,.penalty,.metric,.pending,.rank,.competitors-box,.pen-detail{border-radius:0}
+.mode{background:var(--carbon);border-color:var(--linea)}
+.mode:has(input:checked){background:linear-gradient(160deg,#176b3a,#249a55);border-color:#67e394;color:#fff}
+.mode-head{background:linear-gradient(160deg,var(--rojo-osc),var(--rojo))}
+.count{border-radius:0;background:var(--dorado);color:var(--carbon)}
+.help{border-radius:0;background:rgba(212,169,78,.06);border-color:var(--linea);border-left:4px solid var(--dorado);color:var(--dorado-suave)}
+.btn{border-radius:0;font-family:'Staatliches',sans-serif;font-size:1rem;font-weight:400;letter-spacing:.1em}
+.btn-primary{background:linear-gradient(160deg,var(--rojo),var(--rojo-osc));border-bottom:4px solid var(--dorado);box-shadow:none}
+.btn-dark,.btn-outline{background:var(--carbon);border:1px solid var(--linea);color:var(--dorado-suave)}
+.btn-green{background:linear-gradient(160deg,#176b3a,#249a55);border-bottom:3px solid #67e394}
+.team-no,.rank-arrow{border-radius:0}
+.team-no{background:var(--dorado);color:var(--carbon);font-family:'Staatliches',sans-serif}
+.chip{border-radius:0;background:var(--carbon);border-color:var(--linea);color:var(--dorado-suave)}
+.status{border-radius:0}
+.active-team{border-left:5px solid var(--dorado);background:rgba(212,169,78,.06)}
+.active-team strong,.rank h3{font-family:'Staatliches',sans-serif;letter-spacing:.06em}
+.metrics .metric.final{background:rgba(212,169,78,.08);border-color:var(--dorado)}
+.rank h3{background:linear-gradient(160deg,var(--rojo-osc),var(--rojo));color:var(--crema);font-weight:400}
+th{background:var(--carbon);color:var(--dorado-suave);border-bottom:2px solid var(--dorado)}
+td{border-bottom:1px solid var(--linea)}
+.first{background:rgba(212,169,78,.07)}
+.competitors-title{font-family:'Staatliches',sans-serif;letter-spacing:.1em;color:var(--dorado);background:var(--carbon)}
+.competitor-line b{border-radius:0;background:var(--dorado);color:var(--carbon);font-family:'Staatliches',sans-serif}
+.x{border-radius:0}
+</style>
+
 </head>
 <body>
 <div class="shell">
 <header class="hero"><div><div class="eyebrow">Dirección Nacional de Bomberos</div><h1>Fiscalización · Copa Integración</h1><p>Registro, competencia, corroboración y publicación de resultados</p></div><div style="font-size:12px;color:#b8bec6">DNB · 2026</div></header>
 
 <nav class="flow">
-<button type="button" class="tab active" data-view="v1"><strong><span class="n">1</span>Fiscalizar</strong><small>Registrar equipos y modalidades</small></button>
-<button type="button" class="tab" data-view="v2"><strong><span class="n">2</span>Competencia</strong><small>Tiempo y penalizaciones</small></button>
+<button type="button" class="tab active" data-view="v1"><strong><span class="n">1</span>Acreditación</strong><small>Registrar equipos y modalidades</small></button>
+<button type="button" class="tab" data-view="v2"><strong><span class="n">2</span>Fiscalización</strong><small>Tiempo y penalizaciones</small></button>
 <button type="button" class="tab" data-view="v3"><strong><span class="n">3</span>Corroborar</strong><small>Revisar antes de publicar</small></button>
 <button type="button" class="tab" data-view="v4"><strong><span class="n">4</span>Ranking</strong><small>Resultados oficiales</small></button>
 </nav>
