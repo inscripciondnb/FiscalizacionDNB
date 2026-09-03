@@ -680,10 +680,10 @@ td{border-bottom:1px solid var(--linea)}
           <select id="fixtureMode"><option value="">Seleccionar modalidad</option></select>
         </div>
         <div class="field" style="display:flex;align-items:end">
-          <button id="generateFixture" type="button" class="btn btn-primary" style="width:100%">Generar fixture Top 8</button>
+          <button id="generateFixture" type="button" class="btn btn-primary" style="width:100%">Generar / actualizar fixture</button>
         </div>
       </div>
-      <div class="help">El fixture se arma con los 8 mejores tiempos publicados de la modalidad seleccionada.</div>
+      <div class="help">El fixture se arma con los mejores tiempos disponibles. Si todavía no hay 8 resultados publicados, los lugares restantes quedan LIBRES y se completan automáticamente a medida que se publican nuevos tiempos.</div>
       <div id="fixtureContainer"></div>
     </div>
   </div>
@@ -1171,8 +1171,8 @@ function renderFixture(){
       <div>
         <strong>${escapeHtml(f.ronda)} · LLAVE ${f.llave}</strong>
         <div class="g2" style="margin-top:10px">
-          <div class="active-team"><small>Equipo A</small><strong>#${f.equipoA} — ${escapeHtml(f.delegacionA)}</strong></div>
-          <div class="active-team"><small>Equipo B</small><strong>#${f.equipoB} — ${escapeHtml(f.delegacionB)}</strong></div>
+          <div class="active-team"><small>Equipo A</small><strong>${f.equipoA?('#'+f.equipoA+' — '+escapeHtml(f.delegacionA)):'LIBRE'}</strong></div>
+          <div class="active-team"><small>Equipo B</small><strong>${f.equipoB?('#'+f.equipoB+' — '+escapeHtml(f.delegacionB)):'LIBRE'}</strong></div>
         </div>
       </div>
     </div>
@@ -1189,7 +1189,7 @@ $('generateFixture').onclick=async()=>{
     await syncEstadoRapido();
     $('fixtureMode').value=mode;
     renderFixture();
-    alert('Fixture Top 8 generado.');
+    alert('Fixture generado / actualizado con los tiempos disponibles.');
   }catch(err){
     alert('No se pudo generar el fixture: '+err.message);
   }finally{
