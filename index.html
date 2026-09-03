@@ -451,6 +451,36 @@ td{
  .history-row{grid-template-columns:1fr}
 }
 
+
+/* Estados operativos */
+.status{
+ display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;
+ font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.04em
+}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.status-red{background:rgba(214,40,53,.12);color:#ff707a;border:1px solid rgba(214,40,53,.25)}
+.status-green{background:rgba(47,154,99,.12);color:#62d394;border:1px solid rgba(47,154,99,.25)}
+.status-gold{background:rgba(216,173,82,.10);color:var(--gold-soft);border:1px solid rgba(216,173,82,.20)}
+.competitors-box{
+ margin:10px 0 14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#11151c
+}
+.competitors-title{
+ padding:10px 12px;background:#1c2029;color:var(--gold-soft);font-size:10px;font-weight:900;
+ text-transform:uppercase;letter-spacing:.05em
+}
+.competitor-line{display:flex;align-items:center;gap:9px;padding:9px 12px;border-top:1px solid var(--line);font-size:11px}
+.competitor-line b{display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:#252a34;color:var(--gold-soft)}
+.rank-row{cursor:pointer;transition:.15s ease}
+.rank-row:hover{background:rgba(255,255,255,.035)}
+.rank-arrow{display:inline-grid;place-items:center;width:27px;height:27px;border-radius:8px;background:#232832;color:var(--gold-soft);font-weight:900}
+.rank-detail td{padding:0;text-align:left;background:#0f1218}
+.rank-detail-card{padding:14px 16px;border-top:1px solid rgba(216,173,82,.18)}
+.rank-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pen-detail{padding:9px 11px;margin-top:7px;border:1px solid var(--line);border-radius:11px;background:#171b23;font-size:10.5px}
+.pen-detail strong{color:#ffb0b6}
+.pen-detail small{display:block;color:var(--muted);margin-top:3px}
+.no-pen{color:var(--muted);font-size:11px;padding:8px 0}
+@media(max-width:650px){.rank-detail-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -484,6 +514,10 @@ td{
 <div class="card"><div class="card-title">Equipo en competencia</div><div class="card-body">
 <div class="g2"><div class="field"><label>Equipo</label><select id="compTeam"><option value="">Seleccionar</option></select></div><div class="field"><label>Modalidad</label><select id="compMode"><option value="">Seleccionar equipo primero</option></select></div></div>
 <div class="active-team"><small>Participación seleccionada</small><strong id="activeName">NINGÚN EQUIPO</strong><em id="activeMode">—</em></div>
+<div id="compCompetitors" class="competitors-box" style="display:none">
+ <div class="competitors-title">Integrantes que compiten en esta modalidad</div>
+ <div id="compCompetitorsList"></div>
+</div>
 <div class="g3"><div class="field"><label>Minutos</label><input id="mins" type="number" min="0" value="0"></div><div class="field"><label>Segundos</label><input id="secs" type="number" min="0" max="59" value="0"></div><div class="field"><label>Centésimas</label><input id="cents" type="number" min="0" max="99" value="0"></div></div>
 <div class="field"><label>Observaciones</label><textarea id="compObs"></textarea></div>
 </div></div>
@@ -587,12 +621,64 @@ $('saveTeam').onclick=()=>{
 function editT(i){const t=teams[i];editTeam=i;$('teamNo').value=t.no;$('teamName').value=t.name;$('captain').value=t.captain;document.querySelectorAll('#modes input').forEach(x=>x.checked=t.modes.includes(x.value));renderPeople(t.people);switchView('v1');window.scrollTo({top:0,behavior:'smooth'})}
 function deleteT(i){const t=teams[i],related=results.filter(r=>r.no===t.no).length;if(!confirm(`¿Eliminar Equipo #${t.no} — ${t.name}?${related?`\nTambién se eliminarán ${related} participaciones.`:''}`))return;results=results.filter(r=>r.no!==t.no);teams.splice(i,1);log('ELIMINACIÓN',t.no,'','Equipo eliminado');renderAll()}
 window.editT=editT;window.deleteT=deleteT;
+function modeStatus(t,m){
+ const r=results.find(x=>x.no===t.no&&x.mode===m);
+ if(!r) return {cls:'status-red',text:'Aún no compitió'};
+ if(r.published) return {cls:'status-green',text:'Corroborado / publicado'};
+ return {cls:'status-gold',text:'Pendiente de corroboración'};
+}
 function renderTeams(){
- $('teamsList').innerHTML=teams.length?teams.slice().sort((a,b)=>a.no-b.no).map(t=>{const i=teams.indexOf(t);return `<div class="team"><div><strong><span class="team-no">#${t.no}</span>${escapeHtml(t.name)}</strong><small>Capitán: ${escapeHtml(t.captain||'—')}</small>${t.modes.map(m=>`<span class="chip">${m}</span>`).join('')}</div><div class="actions"><button class="btn btn-outline" onclick="editT(${i})">Editar</button><button class="btn btn-delete" onclick="deleteT(${i})">Eliminar</button></div></div>`}).join(''):'<div class="empty">No hay equipos registrados.</div>';
+ $('teamsList').innerHTML=teams.length?teams.slice().sort((a,b)=>a.no-b.no).map(t=>{
+   const i=teams.indexOf(t);
+   const modes=t.modes.map(m=>{
+     const s=modeStatus(t,m);
+     return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:7px;padding:7px 8px;border:1px solid var(--line);border-radius:11px;background:#10141b">
+       <span class="chip" style="margin:0">${m}</span>
+       <span class="status ${s.cls}">${s.text}</span>
+     </div>`;
+   }).join('');
+   return `<div class="team"><div>
+     <strong><span class="team-no">#${t.no}</span>${escapeHtml(t.name)}</strong>
+     <small>Capitán: ${escapeHtml(t.captain||'—')}</small>
+     <div>${modes}</div>
+   </div><div class="actions">
+     <button class="btn btn-outline" onclick="editT(${i})">Editar</button>
+     <button class="btn btn-delete" onclick="deleteT(${i})">Eliminar</button>
+   </div></div>`;
+ }).join(''):'<div class="empty">No hay equipos registrados.</div>';
 }
 function renderTeamSelect(){const val=$('compTeam').value;$('compTeam').innerHTML='<option value="">Seleccionar</option>'+teams.slice().sort((a,b)=>a.no-b.no).map(t=>`<option value="${teams.indexOf(t)}">#${t.no} — ${escapeHtml(t.name)}</option>`).join('');if(val!==''&&teams[val])$('compTeam').value=val}
-$('compTeam').onchange=()=>{const i=$('compTeam').value;$('compMode').innerHTML='<option value="">Seleccionar modalidad</option>';$('penalties').innerHTML='';$('mins').value=$('secs').value=$('cents').value=0;$('compObs').value='';if(i===''){$('activeName').textContent='NINGÚN EQUIPO';$('activeMode').textContent='—';calc();return}const t=teams[i];$('activeName').textContent=`#${t.no} — ${t.name}`;$('compMode').innerHTML+=[...t.modes].map(m=>`<option>${m}</option>`).join('');$('activeMode').textContent='SELECCIONÁ MODALIDAD';calc()}
-$('compMode').onchange=()=>{const ti=$('compTeam').value,m=$('compMode').value;if(ti===''||!m)return;const t=teams[ti],r=results.find(x=>x.no===t.no&&x.mode===m);$('activeMode').textContent=m;$('penalties').innerHTML='';if(r){$('mins').value=Math.floor(r.time/60);$('secs').value=Math.floor(r.time%60);$('cents').value=Math.round((r.time-Math.floor(r.time))*100);$('compObs').value=r.obs;(r.penalties||[]).forEach(addPenalty)}else{$('mins').value=$('secs').value=$('cents').value=0;$('compObs').value=''}calc()}
+$('compTeam').onchange=()=>{const i=$('compTeam').value;$('compMode').innerHTML='<option value="">Seleccionar modalidad</option>';$('penalties').innerHTML='';$('mins').value=$('secs').value=$('cents').value=0;$('compObs').value='';if(i===''){$('activeName').textContent='NINGÚN EQUIPO';$('activeMode').textContent='—';$('compCompetitors').style.display='none';$('compCompetitorsList').innerHTML='';calc();return}const t=teams[i];$('activeName').textContent=`#${t.no} — ${t.name}`;$('compMode').innerHTML+=[...t.modes].map(m=>`<option>${m}</option>`).join('');$('activeMode').textContent='SELECCIONÁ MODALIDAD';calc()}
+$('compMode').onchange=()=>{
+ const ti=$('compTeam').value,m=$('compMode').value;
+ if(ti===''||!m){
+   $('compCompetitors').style.display='none';
+   $('compCompetitorsList').innerHTML='';
+   return;
+ }
+ const t=teams[ti],r=results.find(x=>x.no===t.no&&x.mode===m);
+ $('activeMode').textContent=m;
+
+ // Show the exact participants registered for this modality.
+ const people=(t.people&&t.people[m])||[];
+ $('compCompetitors').style.display='block';
+ $('compCompetitorsList').innerHTML=people.length
+   ? people.map((p,i)=>`<div class="competitor-line"><b>${i+1}</b><span><strong>${escapeHtml(p.name)}</strong>${p.sex||p.age?` <small style="color:var(--muted)">· ${escapeHtml(p.sex||'')}${p.age?' · '+escapeHtml(p.age)+' años':''}</small>`:''}</span></div>`).join('')
+   : '<div class="competitor-line"><span style="color:var(--muted)">No hay integrantes registrados para esta modalidad.</span></div>';
+
+ $('penalties').innerHTML='';
+ if(r){
+   $('mins').value=Math.floor(r.time/60);
+   $('secs').value=Math.floor(r.time%60);
+   $('cents').value=Math.round((r.time-Math.floor(r.time))*100);
+   $('compObs').value=r.obs;
+   (r.penalties||[]).forEach(addPenalty);
+ }else{
+   $('mins').value=$('secs').value=$('cents').value=0;
+   $('compObs').value='';
+ }
+ calc();
+}
 function addPenalty(d={}){
  const div=document.createElement('div');div.className='penalty';div.innerHTML=`<div class="pen-grid"><div><label>Tipo</label><select class="ptype">${PEN.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('')}</select></div><div><label>Segundos</label><input class="pseconds" type="number" min="0" value="${d.seconds??5}"></div><div><label>Reincidencia</label><select class="prepeat"><option>NO</option><option>SÍ</option></select></div><button class="x" type="button">×</button></div><div style="margin-top:8px"><label>Detalle</label><input class="pdetail" value="${escapeHtml(d.detail||'')}"></div>`;div.querySelector('.ptype').value=d.type??0;div.querySelector('.prepeat').value=d.repeat?'SÍ':'NO';div.querySelector('.ptype').onchange=e=>{div.querySelector('.pseconds').value=PEN[+e.target.value][1];calc()};div.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',calc));div.querySelector('.x').onclick=()=>{div.remove();calc()};$('penalties').appendChild(div)
 }
@@ -664,7 +750,45 @@ function saveReview(publish){
 }
 $('saveReview').onclick=()=>saveReview(false);$('publish').onclick=()=>saveReview(true);
 function renderHistory(){$('history').innerHTML=logs.length?[...logs].reverse().map(h=>`<div class="history-row"><time>${h.date}</time><strong>Equipo #${h.no}${h.mode?' · '+h.mode:''}<br>${h.action}</strong><span>${h.detail}</span></div>`).join(''):'<div class="empty">Sin cambios registrados.</div>'}
-function renderRanking(){const pub=results.filter(r=>r.published),modes=[...new Set(pub.map(r=>r.mode))].sort();$('ranking').innerHTML=modes.length?modes.map(m=>{const list=pub.filter(r=>r.mode===m).sort((a,b)=>a.final-b.final);return `<div class="rank"><h3>${m}</h3><table><thead><tr><th>Pos.</th><th>Equipo</th><th>Delegación</th><th>Tiempo</th><th>Penalización</th><th>Final</th></tr></thead><tbody>${list.map((r,i)=>`<tr class="${i===0?'first':''}"><td>${i+1}°</td><td>#${r.no}</td><td>${escapeHtml(r.name)}</td><td>${fmt(r.time)}</td><td>${r.pen?'+'+fmt(r.pen):'—'}</td><td><strong>${fmt(r.final)}</strong></td></tr>`).join('')}</tbody></table></div>`}).join(''):'<div class="empty">No hay resultados publicados.</div>'}
+function toggleRankDetail(id){
+ const el=document.getElementById(id);
+ if(!el)return;
+ el.hidden=!el.hidden;
+}
+window.toggleRankDetail=toggleRankDetail;
+
+function renderRanking(){
+ const pub=results.filter(r=>r.published);
+ const modes=[...new Set(pub.map(r=>r.mode))].sort();
+ $('ranking').innerHTML=modes.length?modes.map((m,mi)=>{
+   const list=pub.filter(r=>r.mode===m).sort((a,b)=>a.final-b.final);
+   return `<div class="rank"><h3>${m}</h3>
+   <table><thead><tr><th>Pos.</th><th>Equipo</th><th>Delegación</th><th>Tiempo</th><th>Penalización</th><th>Final</th><th>Detalle</th></tr></thead>
+   <tbody>${list.map((r,i)=>{
+     const did=`rankdetail-${mi}-${i}`;
+     const pens=(r.penalties||[]);
+     const penHtml=pens.length?pens.map((p,pi)=>{
+       const name=(PEN[p.type]&&PEN[p.type][0])||'Penalización';
+       const applied=(+p.seconds||0)*(p.repeat?2:1);
+       return `<div class="pen-detail"><strong>${pi+1}. ${escapeHtml(name)} · +${fmt(applied)}</strong>
+         <small>${p.repeat?'Reincidencia · ':''}${escapeHtml(p.detail||'Sin detalle')}</small></div>`;
+     }).join(''):'<div class="no-pen">Sin penalizaciones registradas.</div>';
+     const people=(r.people||[]).map((p,j)=>`<div class="competitor-line"><b>${j+1}</b><span>${escapeHtml(p.name)}</span></div>`).join('');
+     return `<tr class="${i===0?'first ':''}rank-row" onclick="toggleRankDetail('${did}')">
+       <td>${i+1}°</td><td>#${r.no}</td><td>${escapeHtml(r.name)}</td><td>${fmt(r.time)}</td>
+       <td>${r.pen?'+'+fmt(r.pen):'—'}</td><td><strong>${fmt(r.final)}</strong></td><td><span class="rank-arrow">⌄</span></td>
+     </tr>
+     <tr id="${did}" class="rank-detail" hidden><td colspan="7">
+       <div class="rank-detail-card"><div class="rank-detail-grid">
+         <div><label>Integrantes</label>${people||'<div class="no-pen">Sin integrantes.</div>'}</div>
+         <div><label>Penalizaciones aplicadas</label>${penHtml}</div>
+       </div>
+       ${r.obs?`<div style="margin-top:10px"><label>Observaciones</label><div class="pen-detail">${escapeHtml(r.obs)}</div></div>`:''}
+       </div>
+     </td></tr>`;
+   }).join('')}</tbody></table></div>`;
+ }).join(''):'<div class="empty">No hay resultados publicados.</div>';
+}
 function renderAll(){persist();renderTeams();renderTeamSelect();renderPending();renderHistory();renderRanking()}
 renderPeople({});renderAll();calc();
 })();
