@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Fiscalización — Copa Integración DNB 2026</title>
+<style>
+:root{--bg:#0e1013;--panel:#171a20;--panel2:#20242b;--line:#353b45;--red:#bd2029;--red2:#8e171d;--gold:#d6ad50;--gold2:#efd58c;--text:#f4f5f6;--muted:#9ca3ad;--green:#2f8b5c;--blue:#326f9d}
+*{box-sizing:border-box}body{margin:0;background:#0e1013;color:var(--text);font-family:Arial,Helvetica,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:18px}.header{border:1px solid var(--line);background:var(--panel);margin-bottom:16px}.stripe{height:5px;background:linear-gradient(90deg,var(--red) 0 78%,var(--gold) 78%)}
+.header-body{padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:20px}.brand{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:900}.header h1{margin:5px 0 0;font-size:2rem}.header p{margin:5px 0 0;color:var(--muted);font-size:.8rem}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);margin-bottom:16px}.tab{min-height:64px;padding:10px 13px;border:0;border-right:1px solid var(--line);background:#171a20;color:var(--muted);text-align:left;font-weight:900;text-transform:uppercase;font-size:.72rem}.tab:last-child{border-right:0}.tab b{display:inline-flex;width:23px;height:23px;align-items:center;justify-content:center;background:#292e36;color:#fff;margin-right:7px}.tab span{display:block;margin:5px 0 0 30px;text-transform:none;font-size:.61rem;font-weight:500;color:#737b86}.tab.active{background:var(--red);color:#fff;box-shadow:inset 0 -4px 0 var(--gold)}.tab.active span{color:#f2c9cc}.view{display:none}.view.active{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.panel{border:1px solid var(--line);background:var(--panel)}.title{padding:13px 15px;background:var(--panel2);border-bottom:1px solid var(--line);border-left:5px solid var(--red);font-size:.78rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase}.body{padding:15px}.field{margin-bottom:11px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+label{display:block;margin-bottom:5px;color:var(--muted);font-size:.62rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase}input,select,textarea{width:100%;padding:9px 10px;background:#0f1115;border:1px solid var(--line);color:#fff;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--gold)}textarea{min-height:75px;resize:vertical}
+.btn{min-height:40px;border:0;padding:0 13px;font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.035em}.red{background:var(--red);color:#fff;border-bottom:3px solid var(--gold)}.dark{background:#101216;color:#fff;border:1px solid var(--line)}.green{background:var(--green);color:#fff}.blue{background:var(--blue);color:#fff}.full{width:100%}
+.participants{border:1px solid var(--line)}.ph,.pr{display:grid;grid-template-columns:40px 1fr .7fr 70px 38px;align-items:center}.ph{background:var(--red);font-size:.58rem;font-weight:900;text-transform:uppercase}.ph>div,.pr>div{padding:8px;border-right:1px solid var(--line)}.pr{border-bottom:1px solid var(--line)}.pr:last-child{border-bottom:0}.num{text-align:center;color:var(--gold);font-weight:900}.remove{width:27px;height:27px;background:#552028;border:1px solid #78303a;color:#fff}
+.team-active{padding:14px;border:1px solid var(--line);border-left:6px solid var(--gold);background:#111318;margin-bottom:12px}.team-active small{display:block;color:var(--muted);font-size:.6rem;text-transform:uppercase}.team-active strong{display:block;font-size:1.25rem;margin-top:4px}.team-active em{display:block;color:var(--gold);font-style:normal;font-size:.76rem;margin-top:4px;font-weight:800}
+.pen{padding:10px;border:1px solid var(--line);background:#111318;margin-bottom:8px}.pengrid{display:grid;grid-template-columns:1.2fr .55fr .65fr 36px;gap:8px;align-items:end}
+.summary{border:1px solid var(--line);border-top:4px solid var(--gold);padding:10px;margin-top:13px;background:#111318}.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.metric{padding:11px 7px;background:#0e1014;border:1px solid var(--line);text-align:center}.metric strong{display:block;font-size:1.15rem}.metric span{display:block;color:var(--muted);font-size:.56rem;text-transform:uppercase;margin-top:3px}.metric.final{background:#29171a}.metric.final strong{color:var(--gold)}
+.list{display:flex;flex-direction:column;gap:7px}.item{display:grid;grid-template-columns:1.3fr .9fr auto;gap:10px;align-items:center;padding:10px 11px;background:#111318;border:1px solid var(--line)}.item small{color:var(--muted)}.badge{padding:5px 7px;font-size:.58rem;font-weight:900;text-transform:uppercase}.pending{background:#3a3017;color:var(--gold2)}.published{background:#173423;color:#bde4ca}.draft{background:#252b34;color:#c8cdd3}
+table{width:100%;border-collapse:collapse}th{padding:9px;background:var(--red);font-size:.58rem;text-transform:uppercase}td{padding:9px;border-bottom:1px solid var(--line);text-align:center;font-size:.73rem}.first{background:#292418}.rank-group{margin-bottom:16px;border:1px solid var(--line)}.rank-title{padding:10px 12px;background:var(--panel2);border-left:5px solid var(--gold);color:var(--gold2);font-size:.75rem;font-weight:900}.empty{text-align:center;color:var(--muted);padding:20px}
+.history{margin-top:16px}.history-row{display:grid;grid-template-columns:140px 1fr 1fr;gap:8px;padding:9px;border-bottom:1px solid var(--line);font-size:.7rem}.history-row time{color:var(--gold)}.history-row span{color:var(--muted)}
+.notice{padding:10px 11px;border-left:4px solid var(--gold);background:#292418;color:#c7c0aa;font-size:.7rem;line-height:1.45;margin-bottom:12px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+
+.modalidades-check{
+  display:grid;grid-template-columns:1fr 1fr;gap:7px;
+  border:1px solid var(--line);background:#0f1115;padding:10px
+}
+.modalidad-opcion{
+  display:flex;align-items:center;gap:8px;padding:8px;
+  border:1px solid var(--line);background:#15181d;color:#dfe2e6;
+  font-size:.68rem;font-weight:700
+}
+.modalidad-opcion input{width:auto;margin:0}
+.numero-equipo{
+  display:inline-block;background:var(--gold);color:#151515;
+  font-weight:900;padding:5px 8px;margin-right:7px
+}
+.modalidad-integrantes-bloque{
+  border:1px solid var(--line);background:#111318;margin-bottom:12px
+}
+.modalidad-integrantes-titulo{
+  padding:10px 12px;background:var(--panel2);border-left:5px solid var(--gold);
+  color:var(--gold2);font-size:.72rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase
+}
+.modalidad-integrantes-sub{
+  padding:8px 12px;border-top:1px solid var(--line);color:var(--muted);font-size:.66rem
+}
+.modalidad-integrantes-sub strong{color:var(--text)}
+.modalidad-participantes{border-top:1px solid var(--line)}
+.integrantes-requeridos{
+  margin-top:8px;padding:10px 12px;border:1px solid var(--line);
+  border-left:5px solid var(--gold);background:#17191d;color:var(--text);
+  font-size:.72rem;font-weight:800
+}
+.integrantes-requeridos strong{color:var(--gold2)}
+.btn-delete{background:#5a1c23;color:#fff;border:1px solid #7b2b35}
+.modalidad-chip{
+  display:inline-block;padding:4px 7px;margin:2px;background:#282d35;
+  border:1px solid var(--line);color:var(--gold2);font-size:.6rem;font-weight:800
+}
+@media(max-width:600px){.modalidades-check{grid-template-columns:1fr}}
+
+@media(max-width:900px){.tabs{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}
+@media(max-width:600px){.app{padding:8px}.header-body{align-items:flex-start;flex-direction:column}.tabs{grid-template-columns:1fr}.g2,.g3{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr 1fr}.item{grid-template-columns:1fr}.pengrid{grid-template-columns:1fr}.history-row{grid-template-columns:1fr}.ph,.pr{grid-template-columns:35px 1fr 35px}.ph>:nth-child(3),.ph>:nth-child(4),.pr>:nth-child(3),.pr>:nth-child(4){display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header"><div class="stripe"></div><div class="header-body"><div><div class="brand">Dirección Nacional de Bomberos</div><h1>Sistema de Fiscalización</h1><p>Copa Integración DNB 2026 · Flujo operativo completo</p></div><div style="color:var(--muted);font-size:.75rem">Registro → Competencia → Corroboración → Publicación</div></div></header>
+
+<nav class="tabs">
+<button class="tab active" data-tab="registro"><b>1</b> Fiscalizar<span>Registrar equipos e integrantes</span></button>
+<button class="tab" data-tab="competencia"><b>2</b> Penalizaciones<span>Tiempo y sanciones en competencia</span></button>
+<button class="tab" data-tab="corroborar"><b>3</b> Corroboración<span>Revisar, corregir y aprobar</span></button>
+<button class="tab" data-tab="ranking"><b>4</b> Ranking<span>Resultados publicados por modalidad</span></button>
+</nav>
+
+<section id="registro" class="view active">
+<div class="grid">
+<div class="panel"><div class="title">Registro del equipo / competidor</div><div class="body">
+<div class="g3">
+<div class="field"><label>N.º de equipo</label><input id="numeroEquipo" type="number" min="1" placeholder="Ej.: 12"></div>
+<div class="field"><label>Grupo / delegación</label><input id="grupo" placeholder="Ej.: Bomberos de Maldonado"></div>
+<div class="field"><label>Capitán</label><input id="capitan" placeholder="Nombre y apellido"></div>
+</div>
+<div class="field"><label>Modalidades en las que participa este equipo</label>
+<div id="modalidadesRegistro" class="modalidades-check"></div></div>
+<div class="field" style="max-width:260px"><label>Capitán compite</label><select id="capitanCompite"><option>NO</option><option>SÍ</option></select></div>
+</div></div>
+<div class="panel"><div class="title">Integrantes</div><div class="body">
+<div id="infoIntegrantes" class="integrantes-requeridos">Seleccioná una o más modalidades. Cada modalidad desplegará debajo sus integrantes correspondientes.</div>
+<div id="modalidadesIntegrantes" style="margin-top:10px"></div>
+<div class="actions"><button id="guardarEquipo" class="btn green">Registrar equipo</button><button id="nuevoEquipo" class="btn red">Limpiar</button></div>
+</div></div>
+</div>
+<div class="panel" style="margin-top:16px"><div class="title">Equipos registrados</div><div class="body"><div id="listaEquipos" class="list"></div></div></div>
+</section>
+
+<section id="competencia" class="view">
+<div class="grid">
+<div class="panel"><div class="title">Equipo en competencia</div><div class="body">
+<div class="g2">
+<div class="field"><label>Seleccionar N.º de equipo</label><select id="equipoCompetencia"><option value="">Seleccionar</option></select></div>
+<div class="field"><label>Modalidad que está compitiendo</label><select id="modalidadCompetencia"><option value="">Primero seleccioná el equipo</option></select></div>
+</div>
+<div class="team-active"><small>Actualmente seleccionado</small><strong id="compNombre">NINGÚN EQUIPO</strong><em id="compModalidad">SELECCIONÁ EQUIPO Y MODALIDAD</em></div>
+<div class="g3"><div class="field"><label>Minutos</label><input id="min" type="number" min="0" value="0"></div><div class="field"><label>Segundos</label><input id="seg" type="number" min="0" max="59" value="0"></div><div class="field"><label>Centésimas</label><input id="cen" type="number" min="0" max="99" value="0"></div></div>
+<div class="field"><label>Observaciones de competencia</label><textarea id="obsComp"></textarea></div>
+</div></div>
+<div class="panel"><div class="title">Penalizaciones durante la prueba</div><div class="body">
+<div id="penas"></div><button id="addPena" class="btn dark full">+ Agregar penalización</button>
+<div class="summary"><div class="summary-grid"><div class="metric"><strong id="base">00:00.00</strong><span>Tiempo</span></div><div class="metric"><strong id="penaTotal">+00:00.00</strong><span>Penalización</span></div><div class="metric"><strong id="reinc">0</strong><span>Reincidencias</span></div><div class="metric final"><strong id="final">00:00.00</strong><span>Provisorio</span></div></div></div>
+<button id="guardarCompetencia" class="btn green full" style="margin-top:10px">Guardar registro de competencia</button>
+</div></div>
+</div>
+</section>
+
+<section id="corroborar" class="view">
+<div class="grid">
+<div class="panel"><div class="title">Pendientes de corroboración</div><div class="body"><div class="notice">Seleccioná un registro de competencia. Podés revisar y modificar tiempo, penalizaciones, integrantes y datos del equipo antes de publicarlo.</div><div id="pendientes" class="list"></div></div></div>
+<div class="panel"><div class="title">Revisión final</div><div class="body">
+<div id="sinSeleccion" class="empty">Seleccioná un equipo pendiente.</div>
+<div id="editor" style="display:none">
+<div class="g2"><div class="field"><label>Grupo / delegación</label><input id="editGrupo"></div><div class="field"><label>Capitán</label><input id="editCapitan"></div></div>
+<div class="field"><label>Modalidad de esta participación</label><select id="editModalidad"></select></div>
+<div class="g3"><div class="field"><label>Minutos</label><input id="editMin" type="number"></div><div class="field"><label>Segundos</label><input id="editSeg" type="number"></div><div class="field"><label>Centésimas</label><input id="editCen" type="number"></div></div>
+<div class="field"><label>Observación final</label><textarea id="editObs"></textarea></div>
+<div class="summary"><div class="summary-grid"><div class="metric"><strong id="editBase">00:00.00</strong><span>Tiempo</span></div><div class="metric"><strong id="editPena">+00:00.00</strong><span>Penalización</span></div><div class="metric"><strong id="editReinc">0</strong><span>Reincidencias</span></div><div class="metric final"><strong id="editFinal">00:00.00</strong><span>Final</span></div></div></div>
+<div class="actions"><button id="guardarCambios" class="btn blue">Guardar cambios</button><button id="publicar" class="btn green">Corroborar y publicar</button></div>
+</div>
+</div></div>
+</div>
+<div class="panel history"><div class="title">Historial de cambios</div><div class="body"><div id="historial"></div></div></div>
+</section>
+
+<section id="ranking" class="view">
+<div class="panel"><div class="title">Ranking oficial publicado por modalidad</div><div class="body"><div class="notice">Aquí aparecen únicamente los resultados que fueron corroborados y publicados desde la pestaña 3.</div><div id="rankings"></div></div></div>
+</section>
+</div>
+
+<script>
+const MODALIDADES=['GRUPAL MASCULINO','GRUPAL FEMENINO','GRUPO MIXTO','INDIVIDUAL MASCULINO','INDIVIDUAL FEMENINO','INDIVIDUAL MASCULINO +50','INDIVIDUAL FEMENINO +50','GRUPAL MASCULINO +50','GRUPAL FEMENINO +50','GRUPO MIXTO +50'];
+const tipos=[['Error técnico',5],['Incumplimiento de recorrido',10],['Elemento fuera de lugar',5],['Falta de elemento',15],['Conducta antideportiva',20],['Otra',5]];
+let equipos=[], participaciones=[], editPart=null, editEquipo=null;
+
+modalidadesRegistro.innerHTML=MODALIDADES.map(m=>`<label class="modalidad-opcion"><input type="checkbox" value="${m}"> ${m}</label>`).join('');
+
+function integrantesPorModalidad(m){
+  return m.startsWith('INDIVIDUAL') ? 1 : ((m.startsWith('GRUPAL')||m.startsWith('GRUPO')) ? 4 : 0);
+}
+function filaIntegranteHTML(i,d={}){
+  return `<div class="pr">
+    <div class="num">${i+1}</div>
+    <div><input class="inombre" value="${d.nombre||''}" placeholder="Nombre y apellido"></div>
+    <div><select class="isexo"><option></option><option ${d.sexo==='Masculino'?'selected':''}>Masculino</option><option ${d.sexo==='Femenino'?'selected':''}>Femenino</option></select></div>
+    <div><input class="iedad" type="number" value="${d.edad||''}"></div>
+    <div></div>
+  </div>`;
+}
+function datosActualesPorModalidad(){
+  const data={};
+  document.querySelectorAll('.modalidad-integrantes-bloque').forEach(b=>{
+    const m=b.dataset.modalidad;
+    data[m]=[...b.querySelectorAll('.pr')].map(r=>({
+      nombre:r.querySelector('.inombre').value.trim(),
+      sexo:r.querySelector('.isexo').value,
+      edad:r.querySelector('.iedad').value
+    }));
+  });
+  return data;
+}
+function actualizarCantidadIntegrantes(datosPrevios=null){
+  const mods=getMods();
+  const prev=datosPrevios || datosActualesPorModalidad();
+
+  if(!mods.length){
+    infoIntegrantes.innerHTML='Seleccioná una o más modalidades. Cada modalidad desplegará debajo sus integrantes correspondientes.';
+    modalidadesIntegrantes.innerHTML='';
+    return;
+  }
+
+  const total=mods.reduce((a,m)=>a+integrantesPorModalidad(m),0);
+  infoIntegrantes.innerHTML=`Modalidades seleccionadas: <strong>${mods.length}</strong> · Cupos a completar entre todas las modalidades: <strong>${total}</strong>`;
+
+  modalidadesIntegrantes.innerHTML=mods.map(m=>{
+    const n=integrantesPorModalidad(m);
+    const guardados=prev[m]||[];
+    return `<div class="modalidad-integrantes-bloque" data-modalidad="${m}">
+      <div class="modalidad-integrantes-titulo">${m}</div>
+      <div class="modalidad-integrantes-sub">Cantidad de integrantes a ingresar: <strong>${n}</strong></div>
+      <div class="participants modalidad-participantes">
+        <div class="ph"><div>#</div><div>Nombre y apellido</div><div>Sexo</div><div>Edad</div><div></div></div>
+        ${Array.from({length:n},(_,i)=>filaIntegranteHTML(i,guardados[i]||{})).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+modalidadesRegistro.querySelectorAll('input').forEach(x=>x.addEventListener('change',()=>actualizarCantidadIntegrantes()));
+
+function getIntsPorModalidad(){
+  return datosActualesPorModalidad();
+}
+function limpiarRegistro(){
+  numeroEquipo.value='';grupo.value='';capitan.value='';capitanCompite.value='NO';
+  modalidadesRegistro.querySelectorAll('input').forEach(x=>x.checked=false);
+  editEquipo=null;actualizarCantidadIntegrantes({});
+}
+nuevoEquipo.onclick=limpiarRegistro;
+guardarEquipo.onclick=()=>{
+  const numero=+numeroEquipo.value,mods=getMods(),integrantesPorModo=getIntsPorModalidad();
+  if(!numero||!grupo.value.trim()){alert('Ingresá número de equipo y delegación.');return}
+  if(!mods.length){alert('Seleccioná al menos una modalidad.');return}
+  for(const m of mods){
+    const lista=integrantesPorModo[m]||[];
+    if(lista.length!==integrantesPorModalidad(m)||lista.some(x=>!x.nombre)){
+      alert(`Completá todos los integrantes de ${m}.`);return;
+    }
+  }
+  if(equipos.some((e,i)=>e.numero===numero&&i!==editEquipo)){alert('Ese número de equipo ya está asignado.');return}
+  const data={numero,grupo:grupo.value.trim(),capitan:capitan.value.trim(),capitanCompite:capitanCompite.value,modalidades:mods,integrantesPorModalidad:integrantesPorModo};
+  if(editEquipo!==null){equipos[editEquipo]=data;historial('MODIFICACIÓN EQUIPO',numero,'',`Modalidades: ${mods.join(', ')}`)}
+  else{equipos.push(data);historial('REGISTRO EQUIPO',numero,'',`Modalidades: ${mods.join(', ')}`)}
+  limpiarRegistro();renderAll();
+}
+function editarRegistro(i){let e=equipos[i];editEquipo=i;numeroEquipo.value=e.numero;grupo.value=e.grupo;capitan.value=e.capitan;capitanCompite.value=e.capitanCompite;modalidadesRegistro.querySelectorAll('input').forEach(x=>x.checked=e.modalidades.includes(x.value));actualizarCantidadIntegrantes(e.integrantesPorModalidad||{});window.scrollTo({top:0,behavior:'smooth'})}
+function renderEquipos(){listaEquipos.innerHTML=equipos.length?equipos.slice().sort((a,b)=>a.numero-b.numero).map(e=>{let i=equipos.indexOf(e);return `<div class="item"><div><strong><span class="numero-equipo">#${e.numero}</span>${e.grupo}</strong><small>${e.capitan||'Sin capitán'}</small><div>${e.modalidades.map(m=>`<span class="modalidad-chip">${m}</span>`).join('')}</div></div><div><span class="badge draft">${e.modalidades.length} modalidad(es)</span></div><div style="display:flex;gap:6px"><button class="btn dark" onclick="editarRegistro(${i})">Editar</button><button class="btn btn-delete" onclick="eliminarEquipo(${i})">Eliminar</button></div></div>`}).join(''):'<div class="empty">No hay equipos registrados.</div>'}
+
+function eliminarEquipo(i){
+  const e=equipos[i];
+  if(!e)return;
+  const relacionadas=participaciones.filter(p=>p.numero===e.numero);
+  let mensaje=`¿Eliminar definitivamente el Equipo #${e.numero} — ${e.grupo}?`;
+  if(relacionadas.length) mensaje+=`\n\nTambién se eliminarán ${relacionadas.length} registro(s) de competencia asociados a este equipo.`;
+  if(!confirm(mensaje))return;
+  historial('ELIMINACIÓN EQUIPO',e.numero,'',`Equipo eliminado${relacionadas.length?` junto con ${relacionadas.length} participación(es) asociada(s)`:''}`);
+  participaciones=participaciones.filter(p=>p.numero!==e.numero);
+  equipos.splice(i,1);
+  if(editEquipo===i) limpiarRegistro();
+  else editEquipo=null;
+  renderAll();
+}
+function renderSelect(){let v=equipoCompetencia.value;equipoCompetencia.innerHTML='<option value="">Seleccionar</option>'+equipos.slice().sort((a,b)=>a.numero-b.numero).map(e=>`<option value="${equipos.indexOf(e)}">#${e.numero} — ${e.grupo}</option>`).join('');if(v!==''&&equipos[v])equipoCompetencia.value=v}
+equipoCompetencia.onchange=()=>{
+  const i=equipoCompetencia.value;
+  modalidadCompetencia.innerHTML='<option value="">Seleccionar modalidad</option>';
+  penas.innerHTML='';min.value=seg.value=cen.value=0;obsComp.value='';calc();
+  if(i===''){compNombre.textContent='NINGÚN EQUIPO';compModalidad.textContent='SELECCIONÁ EQUIPO Y MODALIDAD';return}
+  let e=equipos[i];compNombre.textContent=`#${e.numero} — ${e.grupo}`;modalidadCompetencia.innerHTML+=[...e.modalidades].map(m=>`<option>${m}</option>`).join('');compModalidad.textContent='SELECCIONÁ LA MODALIDAD';
+}
+modalidadCompetencia.onchange=()=>{
+  const ei=equipoCompetencia.value,m=modalidadCompetencia.value;if(ei===''||!m)return;
+  let e=equipos[ei],p=participaciones.find(x=>x.numero===e.numero&&x.modalidad===m);
+  compModalidad.textContent=m;penas.innerHTML='';
+  if(p){min.value=Math.floor(p.tiempo/60);seg.value=Math.floor(p.tiempo%60);cen.value=Math.round((p.tiempo-Math.floor(p.tiempo))*100);obsComp.value=p.obs||'';(p.penas||[]).forEach(addPena)}
+  else{min.value=seg.value=cen.value=0;obsComp.value=''}
+  calc();
+}
+function addPena(d={}){let r=document.createElement('div');r.className='pen';r.innerHTML=`<div class="pengrid"><div><label>Penalización</label><select class="ptipo">${tipos.map((x,i)=>`<option value="${i}">${x[0]}</option>`).join('')}</select></div><div><label>Segundos</label><input class="pseg" type="number" value="${d.segundos??5}"></div><div><label>Reincidencia</label><select class="pre"><option>NO</option><option>SÍ</option></select></div><div><button class="remove">×</button></div></div><div style="margin-top:7px"><label>Detalle</label><input class="pdet" value="${d.detalle||''}"></div>`;r.querySelector('.ptipo').value=d.tipo??0;r.querySelector('.pre').value=d.reinc?'SÍ':'NO';r.querySelector('.ptipo').onchange=x=>{r.querySelector('.pseg').value=tipos[+x.target.value][1];calc()};r.querySelectorAll('input,select').forEach(x=>x.oninput=calc);r.querySelector('.remove').onclick=()=>{r.remove();calc()};penas.appendChild(r)}
+addPena.onclick=()=>addPena();
+[min,seg,cen].forEach(x=>x.oninput=calc);
+function getPenas(){return [...penas.querySelectorAll('.pen')].map(r=>({tipo:+r.querySelector('.ptipo').value,segundos:+r.querySelector('.pseg').value||0,reinc:r.querySelector('.pre').value==='SÍ',detalle:r.querySelector('.pdet').value.trim()}))}
+function calc(){let t=(+min.value||0)*60+(+seg.value||0)+(+cen.value||0)/100,p=getPenas(),pt=p.reduce((a,x)=>a+x.segundos*(x.reinc?2:1),0),ri=p.filter(x=>x.reinc).length;base.textContent=fmt(t);penaTotal.textContent='+'+fmt(pt);reinc.textContent=ri;final.textContent=fmt(t+pt)}
+guardarCompetencia.onclick=()=>{
+  const ei=equipoCompetencia.value,m=modalidadCompetencia.value;if(ei===''||!m){alert('Seleccioná equipo y modalidad.');return}
+  let e=equipos[ei],t=(+min.value||0)*60+(+seg.value||0)+(+cen.value||0)/100;if(t<=0){alert('Ingresá el tiempo.');return}
+  let ps=getPenas(),pt=ps.reduce((a,x)=>a+x.segundos*(x.reinc?2:1),0),ri=ps.filter(x=>x.reinc).length;
+  let p=participaciones.find(x=>x.numero===e.numero&&x.modalidad===m);
+  if(p){Object.assign(p,{grupo:e.grupo,capitan:e.capitan,integrantes:(e.integrantesPorModalidad[m]||[]),tiempo:t,penas:ps,penaTotal:pt,reinc:ri,final:t+pt,obs:obsComp.value,estado:'PENDIENTE CORROBORACIÓN',publicado:false});historial('MODIFICACIÓN COMPETENCIA',e.numero,m,`Final provisorio ${fmt(t+pt)}`)}
+  else{participaciones.push({numero:e.numero,grupo:e.grupo,capitan:e.capitan,integrantes:(e.integrantesPorModalidad[m]||[]),modalidad:m,tiempo:t,penas:ps,penaTotal:pt,reinc:ri,final:t+pt,obs:obsComp.value,estado:'PENDIENTE CORROBORACIÓN',publicado:false});historial('COMPETENCIA',e.numero,m,`Final provisorio ${fmt(t+pt)}`)}
+  renderAll();alert(`Registro guardado para Equipo #${e.numero} — ${m}.`);
+}
+function renderPend(){let arr=participaciones.map((p,i)=>[p,i]);pendientes.innerHTML=arr.length?arr.map(([p,i])=>`<div class="item"><div><strong><span class="numero-equipo">#${p.numero}</span>${p.grupo}</strong><small>${p.modalidad} · Final ${fmt(p.final)}</small></div><span class="badge ${p.publicado?'published':'pending'}">${p.publicado?'PUBLICADO':'REVISAR'}</span><button class="btn dark" onclick="abrirEditor(${i})">Abrir</button></div>`).join(''):'<div class="empty">No hay participaciones para corroborar.</div>'}
+function abrirEditor(i){editPart=i;let p=participaciones[i];sinSeleccion.style.display='none';editor.style.display='block';editGrupo.value=`#${p.numero} — ${p.grupo}`;editGrupo.readOnly=true;editCapitan.value=p.capitan;editModalidad.innerHTML=`<option>${p.modalidad}</option>`;editMin.value=Math.floor(p.tiempo/60);editSeg.value=Math.floor(p.tiempo%60);editCen.value=Math.round((p.tiempo-Math.floor(p.tiempo))*100);editObs.value=p.obs||'';calcEdit()}
+[editMin,editSeg,editCen].forEach(x=>x.oninput=calcEdit);
+function calcEdit(){if(editPart===null)return;let p=participaciones[editPart],t=(+editMin.value||0)*60+(+editSeg.value||0)+(+editCen.value||0)/100;editBase.textContent=fmt(t);editPena.textContent='+'+fmt(p.penaTotal);editReinc.textContent=p.reinc;editFinal.textContent=fmt(t+p.penaTotal)}
+guardarCambios.onclick=()=>{
+  if(editPart===null)return;let p=participaciones[editPart],antes=fmt(p.final);p.capitan=editCapitan.value.trim();p.tiempo=(+editMin.value||0)*60+(+editSeg.value||0)+(+editCen.value||0)/100;p.final=p.tiempo+p.penaTotal;p.obs=editObs.value;p.publicado=false;p.estado='PENDIENTE CORROBORACIÓN';historial('CORRECCIÓN',p.numero,p.modalidad,`${antes} → ${fmt(p.final)}`);renderAll();calcEdit();alert('Cambios guardados.');
+}
+publicar.onclick=()=>{if(editPart===null)return;let p=participaciones[editPart];p.capitan=editCapitan.value.trim();p.tiempo=(+editMin.value||0)*60+(+editSeg.value||0)+(+editCen.value||0)/100;p.final=p.tiempo+p.penaTotal;p.obs=editObs.value;p.publicado=true;p.estado='PUBLICADO';historial('PUBLICACIÓN',p.numero,p.modalidad,`Resultado oficial ${fmt(p.final)}`);renderAll();alert(`Equipo #${p.numero} · ${p.modalidad} publicado.`)}
+function renderHistorial(){let h=(window._hist||[]).slice().reverse();historial.innerHTML=h.length?h.map(x=>`<div class="history-row"><time>${x.fecha}</time><strong>Equipo #${x.equipo}${x.modalidad?' · '+x.modalidad:''}<br>${x.accion}</strong><span>${x.detalle}</span></div>`).join(''):'<div class="empty">Sin cambios registrados.</div>'}
+function renderRanking(){let pub=participaciones.filter(p=>p.publicado),mods=[...new Set(pub.map(p=>p.modalidad))].sort();rankings.innerHTML=mods.length?mods.map(m=>{let l=pub.filter(p=>p.modalidad===m).sort((a,b)=>a.final-b.final);return `<div class="rank-group"><div class="rank-title">${m}</div><table><thead><tr><th>Pos.</th><th>Equipo</th><th>Delegación</th><th>Tiempo</th><th>Penalización</th><th>Final</th></tr></thead><tbody>${l.map((p,i)=>`<tr class="${i===0?'first':''}"><td>${i+1}°</td><td>#${p.numero}</td><td>${p.grupo}</td><td>${fmt(p.tiempo)}</td><td>${p.penaTotal?'+'+fmt(p.penaTotal):'—'}</td><td><strong>${fmt(p.final)}</strong></td></tr>`).join('')}</tbody></table></div>`}).join(''):'<div class="empty">Todavía no hay resultados publicados.</div>'}
+function renderAll(){renderEquipos();renderSelect();renderPend();renderHistorial();renderRanking()}
+renderAll();calc();actualizarCantidadIntegrantes({});
+</script>
+</body>
+</html>
