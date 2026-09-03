@@ -5,61 +5,452 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Fiscalización | Copa Integración DNB 2026</title>
 <style>
+
 :root{
- --bg:#f3f4f6;--card:#fff;--ink:#17191d;--muted:#69707b;--line:#dfe2e7;
- --red:#b51f2a;--red2:#851720;--gold:#c9a24d;--dark:#20242a;--green:#25734d;
+ --bg:#0b0d12;
+ --bg-soft:#11141b;
+ --card:#171a22;
+ --card-soft:#1d212b;
+ --line:rgba(255,255,255,.08);
+ --line2:rgba(255,255,255,.14);
+ --red:#d62835;
+ --red-dark:#981b24;
+ --gold:#d8ad52;
+ --gold-soft:#f3d68b;
+ --text:#f7f7f8;
+ --muted:#9ea5b1;
+ --green:#2f9a63;
+ --blue:#3b78a8;
+ --shadow:0 18px 55px rgba(0,0,0,.28);
+ --radius:18px;
+ --radius-sm:12px;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Arial,sans-serif}
+body{
+ margin:0;
+ min-height:100vh;
+ background:
+   radial-gradient(circle at 10% 0%,rgba(214,40,53,.18),transparent 26%),
+   radial-gradient(circle at 92% 8%,rgba(216,173,82,.08),transparent 20%),
+   linear-gradient(180deg,#0a0c11 0%,#0e1118 100%);
+ color:var(--text);
+ font-family:Inter,Arial,sans-serif;
+}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
-.shell{max-width:1450px;margin:auto;padding:22px}
-.hero{background:var(--dark);color:white;border-bottom:5px solid var(--gold);padding:24px 28px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-.eyebrow{color:#e1c47d;text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:800}
-.hero h1{margin:5px 0 3px;font-size:30px}.hero p{margin:0;color:#b9bec6;font-size:13px}
-.flow{display:grid;grid-template-columns:repeat(4,1fr);background:white;border:1px solid var(--line);margin:18px 0}
-.tab{border:0;border-right:1px solid var(--line);background:white;padding:15px;text-align:left;color:var(--muted);min-height:74px}
-.tab:last-child{border-right:0}.tab strong{display:block;color:var(--ink);font-size:13px}.tab small{font-size:11px}
-.tab .n{display:inline-grid;place-items:center;width:25px;height:25px;background:#eceef1;margin-right:7px;font-weight:900}
-.tab.active{background:var(--red);color:#f6d9dc}.tab.active strong{color:white}.tab.active .n{background:white;color:var(--red)}
-.view{display:none}.view.active{display:block}
+.shell{max-width:1460px;margin:auto;padding:22px}
+
+/* HERO */
+.hero{
+ position:relative;
+ overflow:hidden;
+ background:
+   linear-gradient(135deg,rgba(214,40,53,.22),rgba(216,173,82,.05)),
+   rgba(20,23,31,.92);
+ color:white;
+ border:1px solid var(--line);
+ border-radius:26px;
+ padding:28px 30px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:20px;
+ box-shadow:var(--shadow);
+}
+.hero:after{
+ content:"";
+ position:absolute;
+ right:-80px;
+ top:-80px;
+ width:220px;
+ height:220px;
+ border-radius:50%;
+ border:1px solid rgba(216,173,82,.15);
+ box-shadow:0 0 0 30px rgba(216,173,82,.02),0 0 0 60px rgba(214,40,53,.02);
+ pointer-events:none;
+}
+.eyebrow{
+ color:var(--gold-soft);
+ text-transform:uppercase;
+ letter-spacing:.16em;
+ font-size:11px;
+ font-weight:900;
+}
+.hero h1{
+ margin:7px 0 5px;
+ font-size:clamp(2rem,4vw,3.2rem);
+ line-height:.95;
+ letter-spacing:-.02em;
+}
+.hero p{margin:0;color:#b8bfca;font-size:13px}
+
+/* TABS */
+.flow{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:10px;
+ margin:18px 0;
+}
+.tab{
+ border:1px solid var(--line);
+ border-radius:16px;
+ background:rgba(22,25,33,.9);
+ padding:14px 15px;
+ text-align:left;
+ color:var(--muted);
+ min-height:78px;
+ box-shadow:0 8px 24px rgba(0,0,0,.12);
+ transition:.18s ease;
+}
+.tab:hover{transform:translateY(-2px);border-color:var(--line2)}
+.tab strong{display:block;color:var(--text);font-size:13px}
+.tab small{display:block;margin-top:5px;font-size:10.5px}
+.tab .n{
+ display:inline-grid;
+ place-items:center;
+ width:27px;
+ height:27px;
+ border-radius:9px;
+ background:#262b35;
+ color:#fff;
+ margin-right:7px;
+ font-weight:900;
+}
+.tab.active{
+ background:linear-gradient(135deg,var(--red),var(--red-dark));
+ color:#ffe5e8;
+ border-color:rgba(255,255,255,.06);
+ box-shadow:0 14px 34px rgba(214,40,53,.22);
+}
+.tab.active strong{color:white}
+.tab.active .n{
+ background:rgba(255,255,255,.95);
+ color:var(--red);
+}
+.view{display:none}
+.view.active{display:block}
+
+/* LAYOUT */
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-.card{background:var(--card);border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.035)}
-.card-title{padding:14px 17px;border-bottom:1px solid var(--line);font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:.055em;display:flex;align-items:center;gap:8px}
-.card-title:before{content:"";width:5px;height:21px;background:var(--red)}
-.card-body{padding:17px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.field{margin-bottom:12px}label{display:block;margin-bottom:6px;font-size:10px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.07em}
-input,select,textarea{width:100%;border:1px solid #ccd1d8;background:#fff;padding:10px 11px;color:var(--ink);outline:none}
-input:focus,select:focus,textarea:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(181,31,42,.08)}
+.card{
+ background:
+   linear-gradient(180deg,rgba(255,255,255,.018),transparent),
+   rgba(23,26,34,.92);
+ border:1px solid var(--line);
+ border-radius:var(--radius);
+ box-shadow:var(--shadow);
+ backdrop-filter:blur(12px);
+}
+.card-title{
+ padding:15px 18px;
+ border-bottom:1px solid var(--line);
+ font-weight:900;
+ font-size:12.5px;
+ text-transform:uppercase;
+ letter-spacing:.065em;
+ display:flex;
+ align-items:center;
+ gap:9px;
+}
+.card-title:before{
+ content:"";
+ width:7px;
+ height:22px;
+ border-radius:5px;
+ background:linear-gradient(180deg,var(--red),var(--gold));
+}
+.card-body{padding:18px}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.field{margin-bottom:12px}
+label{
+ display:block;
+ margin-bottom:6px;
+ font-size:9.5px;
+ color:var(--muted);
+ font-weight:900;
+ text-transform:uppercase;
+ letter-spacing:.075em;
+}
+input,select,textarea{
+ width:100%;
+ border:1px solid var(--line2);
+ background:#10131a;
+ color:var(--text);
+ padding:10px 11px;
+ outline:none;
+ border-radius:11px;
+}
+input:focus,select:focus,textarea:focus{
+ border-color:rgba(216,173,82,.65);
+ box-shadow:0 0 0 3px rgba(216,173,82,.08);
+}
 textarea{min-height:85px;resize:vertical}
+
+/* MODALIDADES */
 .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.mode{display:flex;gap:9px;align-items:center;padding:10px;border:1px solid var(--line);background:#fafafa;font-size:12px;font-weight:700}
-.mode input{width:auto}.mode:has(input:checked){border-color:var(--red);background:#fff3f4;color:var(--red2)}
-.help{background:#fff8e9;border-left:4px solid var(--gold);padding:10px 12px;color:#66552e;font-size:12px;margin-bottom:12px}
-.mode-block{border:1px solid var(--line);margin-bottom:13px;background:white}
-.mode-head{display:flex;justify-content:space-between;gap:12px;align-items:center;background:var(--dark);color:white;padding:11px 13px}
-.mode-head strong{font-size:13px}.count{background:var(--gold);color:#201b10;padding:5px 8px;font-size:10px;font-weight:900}
-.people-head,.person{display:grid;grid-template-columns:40px 1fr 130px 85px;align-items:center}
-.people-head{background:#f0f1f3;color:#656b74;font-size:9px;font-weight:900;text-transform:uppercase}
-.people-head>div,.person>div{padding:8px;border-right:1px solid var(--line)}.person{border-top:1px solid var(--line)}.person .num{text-align:center;font-weight:900;color:var(--red)}
-.btn{border:0;padding:11px 14px;font-size:11px;font-weight:900;text-transform:uppercase}.btn-primary{background:var(--red);color:white;border-bottom:3px solid var(--gold)}
-.btn-dark{background:var(--dark);color:white}.btn-green{background:var(--green);color:white}.btn-outline{background:white;border:1px solid var(--line);color:var(--ink)}
-.btn-delete{background:#fff0f1;border:1px solid #e1a7ac;color:#991c25}.actions{display:flex;gap:8px;flex-wrap:wrap}
-.team{border:1px solid var(--line);padding:13px;margin-bottom:9px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
-.team-no{display:inline-block;background:var(--red);color:white;font-weight:900;padding:5px 8px;margin-right:8px}.team small{display:block;color:var(--muted);margin-top:5px}
-.chip{display:inline-block;background:#f0f1f3;border:1px solid var(--line);padding:4px 6px;margin:5px 3px 0 0;font-size:9px;font-weight:800}
-.active-team{background:var(--dark);color:white;border-left:6px solid var(--gold);padding:15px;margin-bottom:12px}.active-team small{color:#b8bec6}.active-team strong{display:block;font-size:20px;margin-top:4px}.active-team em{display:block;color:#e4c77e;font-style:normal;font-weight:800;margin-top:5px;font-size:12px}
-.penalty{border:1px solid var(--line);padding:10px;margin-bottom:8px}.pen-grid{display:grid;grid-template-columns:1.2fr .5fr .65fr 36px;gap:8px;align-items:end}
-.x{height:39px;border:0;background:#fff0f1;color:#a11f29;font-weight:900}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.metric{background:#f3f4f6;padding:12px;text-align:center;border-top:3px solid #9ba1a9}.metric strong{display:block;font-size:18px}.metric small{color:var(--muted);font-size:9px;text-transform:uppercase}.metric.final{background:#fff4e1;border-color:var(--gold)}
-.pending{border:1px solid var(--line);padding:11px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.pending small{display:block;color:var(--muted);margin-top:4px}
-.history-row{display:grid;grid-template-columns:155px 1fr 1.2fr;gap:10px;padding:9px;border-bottom:1px solid var(--line);font-size:11px}.history-row time{color:var(--red);font-weight:800}.history-row span{color:var(--muted)}
-.rank{border:1px solid var(--line);margin-bottom:16px}.rank h3{margin:0;padding:12px 14px;background:var(--dark);color:#e3c478;font-size:13px}
-table{width:100%;border-collapse:collapse}th{background:var(--red);color:white;padding:9px;font-size:9px;text-transform:uppercase}td{padding:10px;border-bottom:1px solid var(--line);text-align:center;font-size:12px}.first{background:#fff7e5}
-.empty{text-align:center;color:var(--muted);padding:25px;font-size:12px}
-@media(max-width:900px){.flow{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}
-@media(max-width:600px){.shell{padding:8px}.hero{padding:18px}.flow{grid-template-columns:1fr}.g2,.g3,.mode-grid{grid-template-columns:1fr}.people-head,.person{grid-template-columns:35px 1fr}.people-head>:nth-child(3),.people-head>:nth-child(4),.person>:nth-child(3),.person>:nth-child(4){display:none}.metrics{grid-template-columns:1fr 1fr}.history-row{grid-template-columns:1fr}}
+.mode{
+ display:flex;
+ gap:9px;
+ align-items:center;
+ padding:11px;
+ border:1px solid var(--line);
+ background:#131720;
+ border-radius:12px;
+ font-size:11.5px;
+ font-weight:750;
+ transition:.15s ease;
+}
+.mode:hover{border-color:var(--line2)}
+.mode input{width:auto}
+.mode:has(input:checked){
+ border-color:rgba(214,40,53,.45);
+ background:rgba(214,40,53,.08);
+ color:#ffb9bf;
+}
+.help{
+ background:rgba(216,173,82,.07);
+ border:1px solid rgba(216,173,82,.15);
+ border-left:4px solid var(--gold);
+ border-radius:12px;
+ padding:11px 12px;
+ color:#d9c58f;
+ font-size:11.5px;
+ margin-bottom:12px;
+}
+
+/* INTEGRANTES */
+.mode-block{
+ border:1px solid var(--line);
+ border-radius:15px;
+ overflow:hidden;
+ margin-bottom:13px;
+ background:#11141b;
+}
+.mode-head{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:12px;
+ background:
+   linear-gradient(90deg,rgba(214,40,53,.25),rgba(216,173,82,.04)),
+   #1b1f28;
+ color:white;
+ padding:12px 14px;
+}
+.mode-head strong{font-size:12.5px}
+.count{
+ background:var(--gold);
+ color:#241d0f;
+ padding:6px 9px;
+ border-radius:999px;
+ font-size:9px;
+ font-weight:900;
+}
+.people-head,.person{
+ display:grid;
+ grid-template-columns:40px 1fr 130px 85px;
+ align-items:center;
+}
+.people-head{
+ background:#20242c;
+ color:#8f97a3;
+ font-size:8.8px;
+ font-weight:900;
+ text-transform:uppercase;
+}
+.people-head>div,.person>div{padding:9px;border-right:1px solid var(--line)}
+.person{border-top:1px solid var(--line)}
+.person .num{text-align:center;font-weight:900;color:var(--gold-soft)}
+
+/* BUTTONS */
+.btn{
+ border:0;
+ border-radius:11px;
+ padding:11px 14px;
+ font-size:10.5px;
+ font-weight:900;
+ text-transform:uppercase;
+ letter-spacing:.04em;
+ transition:.15s ease;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{
+ background:linear-gradient(135deg,var(--red),var(--red-dark));
+ color:white;
+ box-shadow:0 10px 24px rgba(214,40,53,.18);
+}
+.btn-dark{background:#20252f;color:white;border:1px solid var(--line2)}
+.btn-green{background:linear-gradient(135deg,#2c8457,#38a66a);color:white}
+.btn-outline{background:#12151c;border:1px solid var(--line2);color:var(--text)}
+.btn-delete{background:rgba(214,40,53,.08);border:1px solid rgba(214,40,53,.22);color:#ffadb4}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* EQUIPOS */
+.team{
+ border:1px solid var(--line);
+ border-radius:14px;
+ padding:13px;
+ margin-bottom:9px;
+ display:grid;
+ grid-template-columns:1fr auto;
+ gap:10px;
+ align-items:center;
+ background:#12161e;
+}
+.team-no{
+ display:inline-block;
+ background:linear-gradient(135deg,var(--red),var(--red-dark));
+ color:white;
+ font-weight:900;
+ padding:6px 9px;
+ border-radius:10px;
+ margin-right:8px;
+}
+.team small{display:block;color:var(--muted);margin-top:5px}
+.chip{
+ display:inline-block;
+ background:#1f242d;
+ border:1px solid var(--line);
+ border-radius:999px;
+ padding:5px 7px;
+ margin:5px 3px 0 0;
+ font-size:8.8px;
+ font-weight:800;
+ color:#cbd0d8;
+}
+
+/* COMPETENCIA */
+.active-team{
+ background:
+   linear-gradient(135deg,rgba(216,173,82,.08),rgba(214,40,53,.06)),
+   #151922;
+ color:white;
+ border:1px solid var(--line);
+ border-left:5px solid var(--gold);
+ border-radius:14px;
+ padding:15px;
+ margin-bottom:12px;
+}
+.active-team small{color:#aeb5bf}
+.active-team strong{display:block;font-size:19px;margin-top:4px}
+.active-team em{display:block;color:var(--gold-soft);font-style:normal;font-weight:800;margin-top:5px;font-size:11px}
+
+.penalty{
+ border:1px solid var(--line);
+ border-radius:13px;
+ padding:11px;
+ margin-bottom:8px;
+ background:#12161e;
+}
+.pen-grid{display:grid;grid-template-columns:1.2fr .5fr .65fr 36px;gap:8px;align-items:end}
+.x{
+ height:39px;
+ border:1px solid rgba(214,40,53,.22);
+ border-radius:10px;
+ background:rgba(214,40,53,.07);
+ color:#ff9ea6;
+ font-weight:900;
+}
+
+.metrics{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:8px;
+ margin-top:12px;
+}
+.metric{
+ background:#131720;
+ padding:13px;
+ text-align:center;
+ border:1px solid var(--line);
+ border-radius:13px;
+}
+.metric strong{display:block;font-size:18px}
+.metric small{color:var(--muted);font-size:8.5px;text-transform:uppercase}
+.metric.final{
+ background:linear-gradient(135deg,rgba(216,173,82,.10),rgba(214,40,53,.06));
+ border-color:rgba(216,173,82,.18);
+}
+.metric.final strong{color:var(--gold-soft)}
+
+/* CORROBORACIÓN */
+.pending{
+ border:1px solid var(--line);
+ border-radius:13px;
+ padding:11px;
+ margin-bottom:8px;
+ display:grid;
+ grid-template-columns:1fr auto;
+ gap:10px;
+ align-items:center;
+ background:#12161e;
+}
+.pending small{display:block;color:var(--muted);margin-top:4px}
+
+.history-row{
+ display:grid;
+ grid-template-columns:155px 1fr 1.2fr;
+ gap:10px;
+ padding:10px;
+ border-bottom:1px solid var(--line);
+ font-size:10.5px;
+}
+.history-row time{color:var(--gold-soft);font-weight:800}
+.history-row span{color:var(--muted)}
+
+/* RANKING */
+.rank{
+ border:1px solid var(--line);
+ border-radius:15px;
+ overflow:hidden;
+ margin-bottom:16px;
+ background:#12161e;
+}
+.rank h3{
+ margin:0;
+ padding:12px 14px;
+ background:
+   linear-gradient(90deg,rgba(214,40,53,.22),rgba(216,173,82,.05)),
+   #1b2028;
+ color:var(--gold-soft);
+ font-size:12px;
+}
+table{width:100%;border-collapse:collapse}
+th{
+ background:#181c24;
+ color:#aab1bc;
+ padding:10px;
+ font-size:8.8px;
+ text-transform:uppercase;
+ border-bottom:2px solid var(--red);
+}
+td{
+ padding:10px;
+ border-bottom:1px solid var(--line);
+ text-align:center;
+ font-size:11.5px;
+}
+.first{background:rgba(216,173,82,.06)}
+.empty{text-align:center;color:var(--muted);padding:25px;font-size:11.5px}
+
+@media(max-width:900px){
+ .flow{grid-template-columns:1fr 1fr}
+ .grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .shell{padding:9px}
+ .hero{padding:20px}
+ .flow{grid-template-columns:1fr}
+ .g2,.g3,.mode-grid{grid-template-columns:1fr}
+ .people-head,.person{grid-template-columns:35px 1fr}
+ .people-head>:nth-child(3),.people-head>:nth-child(4),
+ .person>:nth-child(3),.person>:nth-child(4){display:none}
+ .metrics{grid-template-columns:1fr 1fr}
+ .history-row{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -111,6 +502,11 @@ table{width:100%;border-collapse:collapse}th{background:var(--red);color:white;p
 <div class="g2"><div class="field"><label>Equipo</label><input id="reviewTeam" readonly></div><div class="field"><label>Modalidad</label><input id="reviewMode" readonly></div></div>
 <div class="g3"><div class="field"><label>Minutos</label><input id="rMin" type="number"></div><div class="field"><label>Segundos</label><input id="rSec" type="number"></div><div class="field"><label>Centésimas</label><input id="rCent" type="number"></div></div>
 <div class="field"><label>Observación final</label><textarea id="reviewObs"></textarea></div>
+<div class="field">
+  <label>Penalizaciones — revisión final</label>
+  <div id="reviewPenalties"></div>
+  <button id="addReviewPenalty" type="button" class="btn btn-dark" style="width:100%">+ Agregar penalización</button>
+</div>
 <div class="metrics"><div class="metric"><strong id="rBase">00:00.00</strong><small>Tiempo</small></div><div class="metric"><strong id="rPen">+00:00.00</strong><small>Penalización</small></div><div class="metric"><strong id="rRep">0</strong><small>Reincidencias</small></div><div class="metric final"><strong id="rFinal">00:00.00</strong><small>Final</small></div></div>
 <div class="actions" style="margin-top:10px"><button id="saveReview" class="btn btn-dark">Guardar cambios</button><button id="publish" class="btn btn-green">Corroborar y publicar</button></div>
 </div></div></div>
@@ -127,6 +523,17 @@ table{width:100%;border-collapse:collapse}th{background:var(--red);color:white;p
 const MODES=['GRUPAL MASCULINO','GRUPAL FEMENINO','GRUPO MIXTO','INDIVIDUAL MASCULINO','INDIVIDUAL FEMENINO','INDIVIDUAL MASCULINO +50','INDIVIDUAL FEMENINO +50','GRUPAL MASCULINO +50','GRUPAL FEMENINO +50','GRUPO MIXTO +50'];
 const PEN=[['Error técnico',5],['Incumplimiento de recorrido',10],['Elemento fuera de lugar',5],['Falta de elemento',15],['Conducta antideportiva',20],['Otra',5]];
 let teams=[],results=[],logs=[],editTeam=null,reviewIndex=null;
+try{
+  teams=JSON.parse(localStorage.getItem('copa_integracion_teams')||'[]');
+  results=JSON.parse(localStorage.getItem('copa_integracion_results')||'[]');
+  logs=JSON.parse(localStorage.getItem('copa_integracion_logs')||'[]');
+}catch(e){ teams=[]; results=[]; logs=[]; }
+
+function persist(){
+  localStorage.setItem('copa_integracion_teams',JSON.stringify(teams));
+  localStorage.setItem('copa_integracion_results',JSON.stringify(results));
+  localStorage.setItem('copa_integracion_logs',JSON.stringify(logs));
+}
 const $=id=>document.getElementById(id);
 
 function switchView(id){
@@ -163,7 +570,7 @@ function renderPeople(seed){
 $('modes').innerHTML=MODES.map(m=>`<label class="mode"><input type="checkbox" value="${m}"><span>${m}</span></label>`).join('');
 $('modes').addEventListener('change',e=>{if(e.target.matches('input[type=checkbox]'))renderPeople()});
 
-function log(action,no,mode,detail){logs.push({date:new Date().toLocaleString('es-UY'),action,no,mode,detail});renderHistory()}
+function log(action,no,mode,detail){logs.push({date:new Date().toLocaleString('es-UY'),action,no,mode,detail});persist();renderHistory()}
 function clearTeam(){editTeam=null;$('teamNo').value='';$('teamName').value='';$('captain').value='';document.querySelectorAll('#modes input').forEach(x=>x.checked=false);renderPeople({})}
 $('clearTeam').onclick=clearTeam;
 $('saveTeam').onclick=()=>{
@@ -195,15 +602,70 @@ function calc(){const time=(+$('mins').value||0)*60+(+$('secs').value||0)+(+$('c
 ['mins','secs','cents'].forEach(id=>$(id).addEventListener('input',calc));
 $('saveCompetition').onclick=()=>{const ti=$('compTeam').value,m=$('compMode').value;if(ti===''||!m){alert('Seleccioná equipo y modalidad.');return}const t=teams[ti],time=(+$('mins').value||0)*60+(+$('secs').value||0)+(+$('cents').value||0)/100;if(time<=0){alert('Ingresá el tiempo.');return}const penalties=collectPen(),pen=penalties.reduce((a,x)=>a+x.seconds*(x.repeat?2:1),0),rep=penalties.filter(x=>x.repeat).length;let r=results.find(x=>x.no===t.no&&x.mode===m),data={no:t.no,name:t.name,captain:t.captain,mode:m,people:t.people[m],time,penalties,pen,rep,final:time+pen,obs:$('compObs').value.trim(),published:false};if(r)Object.assign(r,data);else results.push(data);log('COMPETENCIA',t.no,m,`Tiempo provisorio ${fmt(time+pen)}`);renderAll();alert('Participación guardada y enviada a corroboración.')}
 function renderPending(){$('pendingList').innerHTML=results.length?results.map((r,i)=>`<div class="pending"><div><strong>#${r.no} · ${escapeHtml(r.name)}</strong><small>${r.mode} · ${fmt(r.final)} ${r.published?'· PUBLICADO':'· PENDIENTE'}</small></div><button class="btn btn-outline" onclick="openReview(${i})">Revisar</button></div>`).join(''):'<div class="empty">No hay participaciones para corroborar.</div>'}
-function openReview(i){reviewIndex=i;const r=results[i];$('reviewEmpty').hidden=true;$('review').hidden=false;$('reviewTeam').value=`#${r.no} — ${r.name}`;$('reviewMode').value=r.mode;$('rMin').value=Math.floor(r.time/60);$('rSec').value=Math.floor(r.time%60);$('rCent').value=Math.round((r.time-Math.floor(r.time))*100);$('reviewObs').value=r.obs;calcReview()}
+function reviewPenaltyRow(d={}){
+ const div=document.createElement('div');
+ div.className='penalty review-penalty';
+ div.innerHTML=`<div class="pen-grid">
+   <div><label>Tipo</label><select class="rtype">${PEN.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('')}</select></div>
+   <div><label>Segundos</label><input class="rseconds" type="number" min="0" value="${d.seconds??5}"></div>
+   <div><label>Reincidencia</label><select class="rrepeat"><option>NO</option><option>SÍ</option></select></div>
+   <button class="x" type="button">×</button>
+ </div>
+ <div style="margin-top:8px"><label>Detalle</label><input class="rdetail" value="${escapeHtml(d.detail||'')}"></div>`;
+ div.querySelector('.rtype').value=d.type??0;
+ div.querySelector('.rrepeat').value=d.repeat?'SÍ':'NO';
+ div.querySelector('.rtype').addEventListener('change',e=>{
+   div.querySelector('.rseconds').value=PEN[+e.target.value][1];
+   calcReview();
+ });
+ div.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',calcReview));
+ div.querySelector('.x').onclick=()=>{div.remove();calcReview()};
+ $('reviewPenalties').appendChild(div);
+}
+function collectReviewPenalties(){
+ return [...document.querySelectorAll('#reviewPenalties .review-penalty')].map(d=>({
+   type:+d.querySelector('.rtype').value,
+   seconds:+d.querySelector('.rseconds').value||0,
+   repeat:d.querySelector('.rrepeat').value==='SÍ',
+   detail:d.querySelector('.rdetail').value.trim()
+ }));
+}
+$('addReviewPenalty').onclick=()=>reviewPenaltyRow();
+
+function openReview(i){reviewIndex=i;const r=results[i];$('reviewEmpty').hidden=true;$('review').hidden=false;$('reviewTeam').value=`#${r.no} — ${r.name}`;$('reviewMode').value=r.mode;$('rMin').value=Math.floor(r.time/60);$('rSec').value=Math.floor(r.time%60);$('rCent').value=Math.round((r.time-Math.floor(r.time))*100);$('reviewObs').value=r.obs;$('reviewPenalties').innerHTML='';(r.penalties||[]).forEach(reviewPenaltyRow);calcReview()}
 window.openReview=openReview;
-function calcReview(){if(reviewIndex===null)return;const r=results[reviewIndex],time=(+$('rMin').value||0)*60+(+$('rSec').value||0)+(+$('rCent').value||0)/100;$('rBase').textContent=fmt(time);$('rPen').textContent='+'+fmt(r.pen);$('rRep').textContent=r.rep;$('rFinal').textContent=fmt(time+r.pen)}
+function calcReview(){
+ if(reviewIndex===null)return;
+ const time=(+$('rMin').value||0)*60+(+$('rSec').value||0)+(+$('rCent').value||0)/100;
+ const penalties=collectReviewPenalties();
+ const pen=penalties.reduce((a,x)=>a+x.seconds*(x.repeat?2:1),0);
+ const rep=penalties.filter(x=>x.repeat).length;
+ $('rBase').textContent=fmt(time);
+ $('rPen').textContent='+'+fmt(pen);
+ $('rRep').textContent=rep;
+ $('rFinal').textContent=fmt(time+pen);
+}
 ['rMin','rSec','rCent'].forEach(id=>$(id).addEventListener('input',calcReview));
-function saveReview(publish){if(reviewIndex===null)return;const r=results[reviewIndex],old=fmt(r.final);r.time=(+$('rMin').value||0)*60+(+$('rSec').value||0)+(+$('rCent').value||0)/100;r.final=r.time+r.pen;r.obs=$('reviewObs').value.trim();r.published=!!publish;log(publish?'PUBLICACIÓN':'CORRECCIÓN',r.no,r.mode,`${old} → ${fmt(r.final)}`);renderAll();calcReview();alert(publish?'Resultado corroborado y publicado.':'Cambios guardados.')}
+function saveReview(publish){
+ if(reviewIndex===null)return;
+ const r=results[reviewIndex],old=fmt(r.final);
+ const penalties=collectReviewPenalties();
+ r.time=(+$('rMin').value||0)*60+(+$('rSec').value||0)+(+$('rCent').value||0)/100;
+ r.penalties=penalties;
+ r.pen=penalties.reduce((a,x)=>a+x.seconds*(x.repeat?2:1),0);
+ r.rep=penalties.filter(x=>x.repeat).length;
+ r.final=r.time+r.pen;
+ r.obs=$('reviewObs').value.trim();
+ r.published=!!publish;
+ log(publish?'PUBLICACIÓN':'CORRECCIÓN',r.no,r.mode,`${old} → ${fmt(r.final)} · Penalización ${fmt(r.pen)}`);
+ persist();
+ renderAll();calcReview();
+ alert(publish?'Resultado corroborado, publicado y guardado.':'Cambios guardados.');
+}
 $('saveReview').onclick=()=>saveReview(false);$('publish').onclick=()=>saveReview(true);
 function renderHistory(){$('history').innerHTML=logs.length?[...logs].reverse().map(h=>`<div class="history-row"><time>${h.date}</time><strong>Equipo #${h.no}${h.mode?' · '+h.mode:''}<br>${h.action}</strong><span>${h.detail}</span></div>`).join(''):'<div class="empty">Sin cambios registrados.</div>'}
 function renderRanking(){const pub=results.filter(r=>r.published),modes=[...new Set(pub.map(r=>r.mode))].sort();$('ranking').innerHTML=modes.length?modes.map(m=>{const list=pub.filter(r=>r.mode===m).sort((a,b)=>a.final-b.final);return `<div class="rank"><h3>${m}</h3><table><thead><tr><th>Pos.</th><th>Equipo</th><th>Delegación</th><th>Tiempo</th><th>Penalización</th><th>Final</th></tr></thead><tbody>${list.map((r,i)=>`<tr class="${i===0?'first':''}"><td>${i+1}°</td><td>#${r.no}</td><td>${escapeHtml(r.name)}</td><td>${fmt(r.time)}</td><td>${r.pen?'+'+fmt(r.pen):'—'}</td><td><strong>${fmt(r.final)}</strong></td></tr>`).join('')}</tbody></table></div>`}).join(''):'<div class="empty">No hay resultados publicados.</div>'}
-function renderAll(){renderTeams();renderTeamSelect();renderPending();renderHistory();renderRanking()}
+function renderAll(){persist();renderTeams();renderTeamSelect();renderPending();renderHistory();renderRanking()}
 renderPeople({});renderAll();calc();
 })();
 </script>
