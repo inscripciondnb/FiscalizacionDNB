@@ -71,10 +71,10 @@ table{width:100%;border-collapse:collapse}th{padding:9px;background:var(--red);f
 <header class="header"><div class="stripe"></div><div class="header-body"><div><div class="brand">Dirección Nacional de Bomberos</div><h1>Sistema de Fiscalización</h1><p>Copa Integración DNB 2026 · Flujo operativo completo</p></div><div style="color:var(--muted);font-size:.75rem">Registro → Competencia → Corroboración → Publicación</div></div></header>
 
 <nav class="tabs">
-<button class="tab active" data-tab="registro"><b>1</b> Fiscalizar<span>Registrar equipos e integrantes</span></button>
-<button class="tab" data-tab="competencia"><b>2</b> Penalizaciones<span>Tiempo y sanciones en competencia</span></button>
-<button class="tab" data-tab="corroborar"><b>3</b> Corroboración<span>Revisar, corregir y aprobar</span></button>
-<button class="tab" data-tab="ranking"><b>4</b> Ranking<span>Resultados publicados por modalidad</span></button>
+<button type="button" class="tab active" data-tab="registro" onclick="cambiarPestana('registro')"><b>1</b> Fiscalizar<span>Registrar equipos e integrantes</span></button>
+<button type="button" class="tab" data-tab="competencia" onclick="cambiarPestana('competencia')"><b>2</b> Penalizaciones<span>Tiempo y sanciones en competencia</span></button>
+<button type="button" class="tab" data-tab="corroborar" onclick="cambiarPestana('corroborar')"><b>3</b> Corroboración<span>Revisar, corregir y aprobar</span></button>
+<button type="button" class="tab" data-tab="ranking" onclick="cambiarPestana('ranking')"><b>4</b> Ranking<span>Resultados publicados por modalidad</span></button>
 </nav>
 
 <section id="registro" class="view active">
@@ -141,9 +141,67 @@ table{width:100%;border-collapse:collapse}th{padding:9px;background:var(--red);f
 </div>
 
 <script>
+const modalidadesRegistro = document.getElementById('modalidadesRegistro');
+const modalidadesIntegrantes = document.getElementById('modalidadesIntegrantes');
+const infoIntegrantes = document.getElementById('infoIntegrantes');
+const numeroEquipo = document.getElementById('numeroEquipo');
+const grupo = document.getElementById('grupo');
+const capitan = document.getElementById('capitan');
+const capitanCompite = document.getElementById('capitanCompite');
+const listaEquipos = document.getElementById('listaEquipos');
+const equipoCompetencia = document.getElementById('equipoCompetencia');
+const modalidadCompetencia = document.getElementById('modalidadCompetencia');
+const compNombre = document.getElementById('compNombre');
+const compModalidad = document.getElementById('compModalidad');
+const min = document.getElementById('min');
+const seg = document.getElementById('seg');
+const cen = document.getElementById('cen');
+const obsComp = document.getElementById('obsComp');
+const penas = document.getElementById('penas');
+const base = document.getElementById('base');
+const penaTotal = document.getElementById('penaTotal');
+const reinc = document.getElementById('reinc');
+const finalEl = document.getElementById('final');
+const pendientes = document.getElementById('pendientes');
+const sinSeleccion = document.getElementById('sinSeleccion');
+const editor = document.getElementById('editor');
+const editGrupo = document.getElementById('editGrupo');
+const editCapitan = document.getElementById('editCapitan');
+const editModalidad = document.getElementById('editModalidad');
+const editMin = document.getElementById('editMin');
+const editSeg = document.getElementById('editSeg');
+const editCen = document.getElementById('editCen');
+const editObs = document.getElementById('editObs');
+const editBase = document.getElementById('editBase');
+const editPena = document.getElementById('editPena');
+const editReinc = document.getElementById('editReinc');
+const editFinal = document.getElementById('editFinal');
+const historialEl = document.getElementById('historial');
+const rankings = document.getElementById('rankings');
 const MODALIDADES=['GRUPAL MASCULINO','GRUPAL FEMENINO','GRUPO MIXTO','INDIVIDUAL MASCULINO','INDIVIDUAL FEMENINO','INDIVIDUAL MASCULINO +50','INDIVIDUAL FEMENINO +50','GRUPAL MASCULINO +50','GRUPAL FEMENINO +50','GRUPO MIXTO +50'];
 const tipos=[['Error técnico',5],['Incumplimiento de recorrido',10],['Elemento fuera de lugar',5],['Falta de elemento',15],['Conducta antideportiva',20],['Otra',5]];
 let equipos=[], participaciones=[], editPart=null, editEquipo=null;
+
+function cambiarPestana(id){
+  document.querySelectorAll('.view').forEach(function(v){
+    v.classList.remove('active');
+  });
+  document.querySelectorAll('.tab').forEach(function(b){
+    b.classList.remove('active');
+  });
+
+  const vista=document.getElementById(id);
+  const boton=document.querySelector('.tab[data-tab="'+id+'"]');
+
+  if(vista) vista.classList.add('active');
+  if(boton) boton.classList.add('active');
+
+  if(id==='ranking' && typeof renderRanking==='function'){
+    renderRanking();
+  }
+}
+
+
 
 modalidadesRegistro.innerHTML=MODALIDADES.map(m=>`<label class="modalidad-opcion"><input type="checkbox" value="${m}"> ${m}</label>`).join('');
 
@@ -197,7 +255,11 @@ function actualizarCantidadIntegrantes(datosPrevios=null){
     </div>`;
   }).join('');
 }
-modalidadesRegistro.querySelectorAll('input').forEach(x=>x.addEventListener('change',()=>actualizarCantidadIntegrantes()));
+modalidadesRegistro.querySelectorAll('input[type="checkbox"]').forEach(x=>{
+  x.addEventListener('change', function(){
+    actualizarCantidadIntegrantes();
+  });
+});
 
 function getIntsPorModalidad(){
   return datosActualesPorModalidad();
@@ -207,8 +269,8 @@ function limpiarRegistro(){
   modalidadesRegistro.querySelectorAll('input').forEach(x=>x.checked=false);
   editEquipo=null;actualizarCantidadIntegrantes({});
 }
-nuevoEquipo.onclick=limpiarRegistro;
-guardarEquipo.onclick=()=>{
+document.getElementById('nuevoEquipo').onclick=limpiarRegistro;
+document.getElementById('guardarEquipo').onclick=()=>{
   const numero=+numeroEquipo.value,mods=getMods(),integrantesPorModo=getIntsPorModalidad();
   if(!numero||!grupo.value.trim()){alert('Ingresá número de equipo y delegación.');return}
   if(!mods.length){alert('Seleccioná al menos una modalidad.');return}
@@ -258,11 +320,11 @@ modalidadCompetencia.onchange=()=>{
   calc();
 }
 function addPena(d={}){let r=document.createElement('div');r.className='pen';r.innerHTML=`<div class="pengrid"><div><label>Penalización</label><select class="ptipo">${tipos.map((x,i)=>`<option value="${i}">${x[0]}</option>`).join('')}</select></div><div><label>Segundos</label><input class="pseg" type="number" value="${d.segundos??5}"></div><div><label>Reincidencia</label><select class="pre"><option>NO</option><option>SÍ</option></select></div><div><button class="remove">×</button></div></div><div style="margin-top:7px"><label>Detalle</label><input class="pdet" value="${d.detalle||''}"></div>`;r.querySelector('.ptipo').value=d.tipo??0;r.querySelector('.pre').value=d.reinc?'SÍ':'NO';r.querySelector('.ptipo').onchange=x=>{r.querySelector('.pseg').value=tipos[+x.target.value][1];calc()};r.querySelectorAll('input,select').forEach(x=>x.oninput=calc);r.querySelector('.remove').onclick=()=>{r.remove();calc()};penas.appendChild(r)}
-addPena.onclick=()=>addPena();
+document.getElementById('addPena').onclick=()=>addPena();
 [min,seg,cen].forEach(x=>x.oninput=calc);
 function getPenas(){return [...penas.querySelectorAll('.pen')].map(r=>({tipo:+r.querySelector('.ptipo').value,segundos:+r.querySelector('.pseg').value||0,reinc:r.querySelector('.pre').value==='SÍ',detalle:r.querySelector('.pdet').value.trim()}))}
-function calc(){let t=(+min.value||0)*60+(+seg.value||0)+(+cen.value||0)/100,p=getPenas(),pt=p.reduce((a,x)=>a+x.segundos*(x.reinc?2:1),0),ri=p.filter(x=>x.reinc).length;base.textContent=fmt(t);penaTotal.textContent='+'+fmt(pt);reinc.textContent=ri;final.textContent=fmt(t+pt)}
-guardarCompetencia.onclick=()=>{
+function calc(){let t=(+min.value||0)*60+(+seg.value||0)+(+cen.value||0)/100,p=getPenas(),pt=p.reduce((a,x)=>a+x.segundos*(x.reinc?2:1),0),ri=p.filter(x=>x.reinc).length;base.textContent=fmt(t);penaTotal.textContent='+'+fmt(pt);reinc.textContent=ri;finalEl.textContent=fmt(t+pt)}
+document.getElementById('guardarCompetencia').onclick=()=>{
   const ei=equipoCompetencia.value,m=modalidadCompetencia.value;if(ei===''||!m){alert('Seleccioná equipo y modalidad.');return}
   let e=equipos[ei],t=(+min.value||0)*60+(+seg.value||0)+(+cen.value||0)/100;if(t<=0){alert('Ingresá el tiempo.');return}
   let ps=getPenas(),pt=ps.reduce((a,x)=>a+x.segundos*(x.reinc?2:1),0),ri=ps.filter(x=>x.reinc).length;
@@ -275,11 +337,11 @@ function renderPend(){let arr=participaciones.map((p,i)=>[p,i]);pendientes.inner
 function abrirEditor(i){editPart=i;let p=participaciones[i];sinSeleccion.style.display='none';editor.style.display='block';editGrupo.value=`#${p.numero} — ${p.grupo}`;editGrupo.readOnly=true;editCapitan.value=p.capitan;editModalidad.innerHTML=`<option>${p.modalidad}</option>`;editMin.value=Math.floor(p.tiempo/60);editSeg.value=Math.floor(p.tiempo%60);editCen.value=Math.round((p.tiempo-Math.floor(p.tiempo))*100);editObs.value=p.obs||'';calcEdit()}
 [editMin,editSeg,editCen].forEach(x=>x.oninput=calcEdit);
 function calcEdit(){if(editPart===null)return;let p=participaciones[editPart],t=(+editMin.value||0)*60+(+editSeg.value||0)+(+editCen.value||0)/100;editBase.textContent=fmt(t);editPena.textContent='+'+fmt(p.penaTotal);editReinc.textContent=p.reinc;editFinal.textContent=fmt(t+p.penaTotal)}
-guardarCambios.onclick=()=>{
+document.getElementById('guardarCambios').onclick=()=>{
   if(editPart===null)return;let p=participaciones[editPart],antes=fmt(p.final);p.capitan=editCapitan.value.trim();p.tiempo=(+editMin.value||0)*60+(+editSeg.value||0)+(+editCen.value||0)/100;p.final=p.tiempo+p.penaTotal;p.obs=editObs.value;p.publicado=false;p.estado='PENDIENTE CORROBORACIÓN';historial('CORRECCIÓN',p.numero,p.modalidad,`${antes} → ${fmt(p.final)}`);renderAll();calcEdit();alert('Cambios guardados.');
 }
-publicar.onclick=()=>{if(editPart===null)return;let p=participaciones[editPart];p.capitan=editCapitan.value.trim();p.tiempo=(+editMin.value||0)*60+(+editSeg.value||0)+(+editCen.value||0)/100;p.final=p.tiempo+p.penaTotal;p.obs=editObs.value;p.publicado=true;p.estado='PUBLICADO';historial('PUBLICACIÓN',p.numero,p.modalidad,`Resultado oficial ${fmt(p.final)}`);renderAll();alert(`Equipo #${p.numero} · ${p.modalidad} publicado.`)}
-function renderHistorial(){let h=(window._hist||[]).slice().reverse();historial.innerHTML=h.length?h.map(x=>`<div class="history-row"><time>${x.fecha}</time><strong>Equipo #${x.equipo}${x.modalidad?' · '+x.modalidad:''}<br>${x.accion}</strong><span>${x.detalle}</span></div>`).join(''):'<div class="empty">Sin cambios registrados.</div>'}
+document.getElementById('publicar').onclick=()=>{if(editPart===null)return;let p=participaciones[editPart];p.capitan=editCapitan.value.trim();p.tiempo=(+editMin.value||0)*60+(+editSeg.value||0)+(+editCen.value||0)/100;p.final=p.tiempo+p.penaTotal;p.obs=editObs.value;p.publicado=true;p.estado='PUBLICADO';historial('PUBLICACIÓN',p.numero,p.modalidad,`Resultado oficial ${fmt(p.final)}`);renderAll();alert(`Equipo #${p.numero} · ${p.modalidad} publicado.`)}
+function renderHistorial(){let h=(window._hist||[]).slice().reverse();historialEl.innerHTML=h.length?h.map(x=>`<div class="history-row"><time>${x.fecha}</time><strong>Equipo #${x.equipo}${x.modalidad?' · '+x.modalidad:''}<br>${x.accion}</strong><span>${x.detalle}</span></div>`).join(''):'<div class="empty">Sin cambios registrados.</div>'}
 function renderRanking(){let pub=participaciones.filter(p=>p.publicado),mods=[...new Set(pub.map(p=>p.modalidad))].sort();rankings.innerHTML=mods.length?mods.map(m=>{let l=pub.filter(p=>p.modalidad===m).sort((a,b)=>a.final-b.final);return `<div class="rank-group"><div class="rank-title">${m}</div><table><thead><tr><th>Pos.</th><th>Equipo</th><th>Delegación</th><th>Tiempo</th><th>Penalización</th><th>Final</th></tr></thead><tbody>${l.map((p,i)=>`<tr class="${i===0?'first':''}"><td>${i+1}°</td><td>#${p.numero}</td><td>${p.grupo}</td><td>${fmt(p.tiempo)}</td><td>${p.penaTotal?'+'+fmt(p.penaTotal):'—'}</td><td><strong>${fmt(p.final)}</strong></td></tr>`).join('')}</tbody></table></div>`}).join(''):'<div class="empty">Todavía no hay resultados publicados.</div>'}
 function renderAll(){renderEquipos();renderSelect();renderPend();renderHistorial();renderRanking()}
 renderAll();calc();actualizarCantidadIntegrantes({});
