@@ -557,7 +557,7 @@ td{border-bottom:1px solid var(--linea)}
 </head>
 <body>
 <div class="shell">
-<header class="hero"><div><div class="eyebrow">Dirección Nacional de Bomberos</div><h1>Fiscalización · Copa Integración</h1><p>Registro, competencia, corroboración y publicación de resultados</p></div><div style="font-size:12px;color:#b8bec6">DNB · 2026</div></header>
+<header class="hero"><div><div class="eyebrow">Dirección Nacional de Bomberos</div><h1>Fiscalización · Copa Integración</h1><p>Registro, competencia, corroboración y publicación de resultados</p></div><div style="font-size:12px;color:#b8bec6">DNB · 2026<br><button type="button" class="btn btn-outline" style="margin-top:8px" onclick="syncFromServer()">↻ Sincronizar</button></div></header>
 
 <nav class="flow">
 <button type="button" class="tab active" data-view="v1"><strong><span class="n">1</span>Acreditación</strong><small>Registrar equipos y modalidades</small></button>
@@ -629,17 +629,83 @@ td{border-bottom:1px solid var(--linea)}
 const MODES=['GRUPAL MASCULINO','GRUPAL FEMENINO','GRUPO MIXTO','INDIVIDUAL MASCULINO','INDIVIDUAL FEMENINO','INDIVIDUAL MASCULINO +50','INDIVIDUAL FEMENINO +50','GRUPAL MASCULINO +50','GRUPAL FEMENINO +50','GRUPO MIXTO +50'];
 const PEN=[['Error técnico',5],['Incumplimiento de recorrido',10],['Elemento fuera de lugar',5],['Falta de elemento',15],['Conducta antideportiva',20],['Otra',5]];
 let teams=[],results=[],logs=[],editTeam=null,reviewIndex=null;
-try{
-  teams=JSON.parse(localStorage.getItem('copa_integracion_teams')||'[]');
-  results=JSON.parse(localStorage.getItem('copa_integracion_results')||'[]');
-  logs=JSON.parse(localStorage.getItem('copa_integracion_logs')||'[]');
-}catch(e){ teams=[]; results=[]; logs=[]; }
+const API_URL='https://script.google.com/macros/s/AKfycbyRsnyjtKoIFqkLhWE-OBc8wRM_CFxK4Zeuk94YXNRV4Wt7a3ESsNqMNe_ufebiHBW2QQ/exec';
+let syncing=false;
 
-function persist(){
-  localStorage.setItem('copa_integracion_teams',JSON.stringify(teams));
-  localStorage.setItem('copa_integracion_results',JSON.stringify(results));
-  localStorage.setItem('copa_integracion_logs',JSON.stringify(logs));
+function toLocalTeam(e){
+  return {
+    no:Number(e.numero),
+    name:e.delegacion||'',
+    captain:e.capitan||'',
+    captainCompite:!!e.capitanCompite,
+    modes:Array.isArray(e.modalidades)?e.modalidades:[],
+    people:Object.fromEntries(Object.entries(e.integrantesPorModalidad||{}).map(([m,arr])=>[
+      m,(arr||[]).map(p=>({name:p.nombre||'',sex:p.sexo||'',age:p.edad??''}))
+    ]))
+  };
 }
+function toLocalResult(r){
+  return {
+    no:Number(r.numero),name:r.delegacion||'',captain:r.capitan||'',mode:r.modalidad||'',
+    people:(r.integrantes||[]).map(p=>({name:p.nombre||'',sex:p.sexo||'',age:p.edad??''})),
+    time:Number(r.tiempoBaseSegundos)||0,
+    penalties:(r.penalizaciones||[]).map(p=>({
+      type: penaltyTypeIndex(p.tipo),
+      seconds:Number(p.segundos)||0,
+      repeat:!!p.reincidencia,
+      detail:p.detalle||''
+    })),
+    pen:Number(r.penalizacionTotalSegundos)||0,
+    rep:Number(r.reincidencias)||0,
+    final:Number(r.tiempoFinalSegundos)||0,
+    obs:r.observaciones||'',
+    published:!!r.publicado,
+    estado:r.estado||''
+  };
+}
+function penaltyTypeIndex(tipo){
+  const t=String(tipo??'');
+  const numeric=Number(t);
+  if(Number.isInteger(numeric)&&numeric>=0&&numeric<PEN.length)return numeric;
+  const i=PEN.findIndex(p=>p[0].toUpperCase()===t.toUpperCase());
+  return i>=0?i:Math.max(0,PEN.findIndex(p=>p[0]==='Otra'));
+}
+async function apiGet(accion,params={}){
+  const u=new URL(API_URL);
+  u.searchParams.set('accion',accion);
+  Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
+  const res=await fetch(u.toString(),{cache:'no-store'});
+  const data=await res.json();
+  if(!data.ok)throw new Error(data.error||'Error del servidor');
+  return data;
+}
+async function apiPost(payload){
+  const res=await fetch(API_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(payload)
+  });
+  const data=await res.json();
+  if(!data.ok)throw new Error(data.error||'Error del servidor');
+  return data;
+}
+async function syncFromServer(showError=true){
+  if(syncing)return;
+  syncing=true;
+  try{
+    const data=await apiGet('bootstrap');
+    teams=(data.equipos||[]).map(toLocalTeam);
+    results=(data.participaciones||[]).map(toLocalResult);
+    logs=(data.historial||[]).map(h=>({
+      date:h.fecha?new Date(h.fecha).toLocaleString('es-UY'):'',
+      action:h.accion||'',no:h.numero||'',mode:h.modalidad||'',detail:h.detalle||''
+    }));
+    renderAll();
+  }catch(err){
+    if(showError)alert('No se pudieron cargar los datos compartidos: '+err.message);
+  }finally{syncing=false}
+}
+function persist(){ /* La fuente oficial ahora es Google Sheets. */ }
 const $=id=>document.getElementById(id);
 
 function switchView(id){
@@ -676,22 +742,40 @@ function renderPeople(seed){
 $('modes').innerHTML=MODES.map(m=>`<label class="mode"><input type="checkbox" value="${m}"><span>${m}</span></label>`).join('');
 $('modes').addEventListener('change',e=>{if(e.target.matches('input[type=checkbox]'))renderPeople()});
 
-function log(action,no,mode,detail){logs.push({date:new Date().toLocaleString('es-UY'),action,no,mode,detail});persist();renderHistory()}
+function log(action,no,mode,detail){ /* historial centralizado en Apps Script */ });persist();renderHistory()}
 function clearTeam(){editTeam=null;$('teamNo').value='';$('teamName').value='';$('captain').value='';document.querySelectorAll('#modes input').forEach(x=>x.checked=false);renderPeople({})}
 $('clearTeam').onclick=clearTeam;
-$('saveTeam').onclick=()=>{
+$('saveTeam').onclick=async()=>{
  const no=+$('teamNo').value,name=$('teamName').value.trim(),captain=$('captain').value.trim(),modes=selectedModes(),people=collectPeople();
  if(!no||!name){alert('Ingresá número de equipo y delegación.');return}
  if(!modes.length){alert('Seleccioná al menos una modalidad.');return}
  for(const m of modes){if((people[m]||[]).length!==required(m)||(people[m]||[]).some(p=>!p.name)){alert('Completá todos los integrantes de '+m+'.');return}}
  if(teams.some((t,i)=>t.no===no&&i!==editTeam)){alert('Ese número de equipo ya existe.');return}
- const data={no,name,captain,modes,people};
- if(editTeam===null){teams.push(data);log('REGISTRO',no,'','Equipo registrado')}
- else{teams[editTeam]=data;log('MODIFICACIÓN',no,'','Datos del equipo modificados')}
- clearTeam();renderAll();
+ const integrantesPorModalidad={};
+ Object.entries(people).forEach(([m,arr])=>integrantesPorModalidad[m]=(arr||[]).map(p=>({nombre:p.name,sexo:p.sex,edad:p.age})));
+ const payload={
+   accion:editTeam===null?'registrar_equipo':'editar_equipo',
+   numero:no,delegacion:name,capitan:captain,capitanCompite:false,
+   modalidades:modes,integrantesPorModalidad
+ };
+ try{
+   $('saveTeam').disabled=true;
+   await apiPost(payload);
+   clearTeam();
+   await syncFromServer();
+   alert(editTeam===null?'Equipo acreditado y guardado.':'Equipo actualizado y guardado.');
+ }catch(err){alert('No se pudo guardar: '+err.message)}
+ finally{$('saveTeam').disabled=false}
 };
 function editT(i){const t=teams[i];editTeam=i;$('teamNo').value=t.no;$('teamName').value=t.name;$('captain').value=t.captain;document.querySelectorAll('#modes input').forEach(x=>x.checked=t.modes.includes(x.value));renderPeople(t.people);switchView('v1');window.scrollTo({top:0,behavior:'smooth'})}
-function deleteT(i){const t=teams[i],related=results.filter(r=>r.no===t.no).length;if(!confirm(`¿Eliminar Equipo #${t.no} — ${t.name}?${related?`\nTambién se eliminarán ${related} participaciones.`:''}`))return;results=results.filter(r=>r.no!==t.no);teams.splice(i,1);log('ELIMINACIÓN',t.no,'','Equipo eliminado');renderAll()}
+async function deleteT(i){
+ const t=teams[i],related=results.filter(r=>r.no===t.no).length;
+ if(!confirm(`¿Eliminar Equipo #${t.no} — ${t.name}?${related?`\nTambién se eliminarán ${related} participaciones.`:''}`))return;
+ try{
+   await apiPost({accion:'eliminar_equipo',numero:t.no});
+   await syncFromServer();
+ }catch(err){alert('No se pudo eliminar: '+err.message)}
+}
 window.editT=editT;window.deleteT=deleteT;
 function modeStatus(t,m){
  const r=results.find(x=>x.no===t.no&&x.mode===m);
@@ -758,7 +842,26 @@ $('addPenalty').onclick=()=>addPenalty();
 function collectPen(){return [...document.querySelectorAll('.penalty')].map(d=>({type:+d.querySelector('.ptype').value,seconds:+d.querySelector('.pseconds').value||0,repeat:d.querySelector('.prepeat').value==='SÍ',detail:d.querySelector('.pdetail').value.trim()}))}
 function calc(){const time=(+$('mins').value||0)*60+(+$('secs').value||0)+(+$('cents').value||0)/100,p=collectPen(),pen=p.reduce((a,x)=>a+x.seconds*(x.repeat?2:1),0),rep=p.filter(x=>x.repeat).length;$('baseTime').textContent=fmt(time);$('penTime').textContent='+'+fmt(pen);$('repeatCount').textContent=rep;$('finalTime').textContent=fmt(time+pen)}
 ['mins','secs','cents'].forEach(id=>$(id).addEventListener('input',calc));
-$('saveCompetition').onclick=()=>{const ti=$('compTeam').value,m=$('compMode').value;if(ti===''||!m){alert('Seleccioná equipo y modalidad.');return}const t=teams[ti],time=(+$('mins').value||0)*60+(+$('secs').value||0)+(+$('cents').value||0)/100;if(time<=0){alert('Ingresá el tiempo.');return}const penalties=collectPen(),pen=penalties.reduce((a,x)=>a+x.seconds*(x.repeat?2:1),0),rep=penalties.filter(x=>x.repeat).length;let r=results.find(x=>x.no===t.no&&x.mode===m),data={no:t.no,name:t.name,captain:t.captain,mode:m,people:t.people[m],time,penalties,pen,rep,final:time+pen,obs:$('compObs').value.trim(),published:false};if(r)Object.assign(r,data);else results.push(data);log('COMPETENCIA',t.no,m,`Tiempo provisorio ${fmt(time+pen)}`);renderAll();alert('Participación guardada y enviada a corroboración.')}
+$('saveCompetition').onclick=async()=>{
+ const ti=$('compTeam').value,m=$('compMode').value;
+ if(ti===''||!m){alert('Seleccioná equipo y modalidad.');return}
+ const t=teams[ti],time=(+$('mins').value||0)*60+(+$('secs').value||0)+(+$('cents').value||0)/100;
+ if(time<=0){alert('Ingresá el tiempo.');return}
+ const penalties=collectPen().map(p=>({
+   tipo:(PEN[p.type]&&PEN[p.type][0])||'Otra',
+   segundos:p.seconds,reincidencia:p.repeat,detalle:p.detail
+ }));
+ try{
+   $('saveCompetition').disabled=true;
+   await apiPost({
+     accion:'guardar_fiscalizacion',numero:t.no,modalidad:m,tiempoSegundos:time,
+     penalizaciones:penalties,observaciones:$('compObs').value.trim()
+   });
+   await syncFromServer();
+   alert('Participación guardada y enviada a corroboración.');
+ }catch(err){alert('No se pudo guardar la fiscalización: '+err.message)}
+ finally{$('saveCompetition').disabled=false}
+}
 function renderPending(){$('pendingList').innerHTML=results.length?results.map((r,i)=>`<div class="pending"><div><strong>#${r.no} · ${escapeHtml(r.name)}</strong><small>${r.mode} · ${fmt(r.final)} ${r.published?'· PUBLICADO':'· PENDIENTE'}</small></div><button class="btn btn-outline" onclick="openReview(${i})">Revisar</button></div>`).join(''):'<div class="empty">No hay participaciones para corroborar.</div>'}
 function reviewPenaltyRow(d={}){
  const div=document.createElement('div');
@@ -804,21 +907,25 @@ function calcReview(){
  $('rFinal').textContent=fmt(time+pen);
 }
 ['rMin','rSec','rCent'].forEach(id=>$(id).addEventListener('input',calcReview));
-function saveReview(publish){
+async function saveReview(publish){
  if(reviewIndex===null)return;
- const r=results[reviewIndex],old=fmt(r.final);
- const penalties=collectReviewPenalties();
- r.time=(+$('rMin').value||0)*60+(+$('rSec').value||0)+(+$('rCent').value||0)/100;
- r.penalties=penalties;
- r.pen=penalties.reduce((a,x)=>a+x.seconds*(x.repeat?2:1),0);
- r.rep=penalties.filter(x=>x.repeat).length;
- r.final=r.time+r.pen;
- r.obs=$('reviewObs').value.trim();
- r.published=!!publish;
- log(publish?'PUBLICACIÓN':'CORRECCIÓN',r.no,r.mode,`${old} → ${fmt(r.final)} · Penalización ${fmt(r.pen)}`);
- persist();
- renderAll();calcReview();
- alert(publish?'Resultado corroborado, publicado y guardado.':'Cambios guardados.');
+ const r=results[reviewIndex];
+ const time=(+$('rMin').value||0)*60+(+$('rSec').value||0)+(+$('rCent').value||0)/100;
+ const penalties=collectReviewPenalties().map(p=>({
+   tipo:(PEN[p.type]&&PEN[p.type][0])||'Otra',
+   segundos:p.seconds,reincidencia:p.repeat,detalle:p.detail
+ }));
+ try{
+   await apiPost({
+     accion:publish?'publicar_resultado':'guardar_corroboracion',
+     numero:r.no,modalidad:r.mode,tiempoSegundos:time,
+     penalizaciones:penalties,observaciones:$('reviewObs').value.trim()
+   });
+   await syncFromServer();
+   reviewIndex=results.findIndex(x=>x.no===r.no&&x.mode===r.mode);
+   if(reviewIndex>=0)openReview(reviewIndex);
+   alert(publish?'Resultado corroborado, publicado y guardado en Google Sheets.':'Cambios guardados en Google Sheets.');
+ }catch(err){alert('No se pudo guardar: '+err.message)}
 }
 $('saveReview').onclick=()=>saveReview(false);$('publish').onclick=()=>saveReview(true);
 function renderHistory(){$('history').innerHTML=logs.length?[...logs].reverse().map(h=>`<div class="history-row"><time>${h.date}</time><strong>Equipo #${h.no}${h.mode?' · '+h.mode:''}<br>${h.action}</strong><span>${h.detail}</span></div>`).join(''):'<div class="empty">Sin cambios registrados.</div>'}
@@ -861,8 +968,8 @@ function renderRanking(){
    }).join('')}</tbody></table></div>`;
  }).join(''):'<div class="empty">No hay resultados publicados.</div>';
 }
-function renderAll(){persist();renderTeams();renderTeamSelect();renderPending();renderHistory();renderRanking()}
-renderPeople({});renderAll();calc();
+function renderAll(){renderTeams();renderTeamSelect();renderPending();renderHistory();renderRanking()}
+renderPeople({});renderAll();calc();syncFromServer();
 })();
 </script>
 </body>
